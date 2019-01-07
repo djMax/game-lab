@@ -36,4 +36,10 @@ export default class Game {
     }
     return false;
   }
+
+  done() {
+    if (this.board.reduce((prev, cur) => prev + (cur ? 1 : 0), 0) === 9) {
+      return true;
+    }
+  }
 }

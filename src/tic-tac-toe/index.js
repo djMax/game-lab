@@ -62,7 +62,7 @@ class TicTacToe extends React.Component {
     const { board, xMoving, humanIsX, humanIsO } = this.state;
     const gameState = new GameFunctions(board);
     const winner = gameState.won();
-    if (winner) {
+    if (winner || gameState.done()) {
       return;
     }
     if ((xMoving && humanIsX) || (!xMoving && humanIsO)) {
@@ -83,10 +83,12 @@ class TicTacToe extends React.Component {
   async runMove(gameState) {
     const { code } = this.state;
     try {
-      const transformed = window.Babel.transform(`(function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
+      const retVal = [];
+      const transformed = window.Babel.transform(`retVal[0] = (function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
       // eslint-disable-next-line no-new-func
-      const fn = new Function(...gameState.exposedFunctions, transformed);
-      return fn(...gameState.exposedFunctions.map(f => gameState[f]));
+      const fn = new Function(...gameState.exposedFunctions, 'retVal', transformed);
+      fn(...gameState.exposedFunctions.map(f => gameState[f]), retVal);
+      return retVal[0];
     } catch (error) {
       console.log(error);
       return error.message;
@@ -114,9 +116,8 @@ class TicTacToe extends React.Component {
     });
   }
 
-  headlineForState() {
+  headlineForState(gameState) {
     const { board, xMoving, humanIsX, humanIsO, error } = this.state;
-    const gameState = new GameFunctions(board);
     const winner = gameState.won();
     if (error) {
       return (
@@ -124,6 +125,13 @@ class TicTacToe extends React.Component {
           <FontAwesomeIcon icon={xMoving ? faTimes : faDotCircle} /> failed to move.
         </div>
       )
+    }
+    if (gameState.done()) {
+      return (
+        <div>
+          This game ends in a tie. Well done.
+        </div>
+      );
     }
     if (winner) {
       return (
@@ -155,13 +163,14 @@ class TicTacToe extends React.Component {
     const { board, xMoving, humanIsX, humanIsO, error, code } = this.state;
     const hasMoves = board.find(v => v !== 0);
     const isComputerMove = ((xMoving && !humanIsX) || (!xMoving && !humanIsO))
+    const gameState = new GameFunctions(board);
 
     return (
       <div className={classes.root}>
         <Grid container spacing={24}>
           <Grid item xs>
             <Typography variant="h5" color="primary" className={classes.message}>
-              {this.headlineForState()}
+              {this.headlineForState(gameState)}
             </Typography>
             {error && (
               <Typography variant="body1" className={classes.message}>
@@ -181,7 +190,7 @@ class TicTacToe extends React.Component {
                   Reset Board
                 </Button>
               )}
-              {isComputerMove && (
+              {isComputerMove && !gameState.done() && (
                 <Button
                   variant="contained"
                   className={classes.button}
