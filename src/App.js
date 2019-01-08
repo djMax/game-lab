@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextField, Button, AppBar, Toolbar, Typography, withStyles } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, withStyles } from '@material-ui/core';
 import Api from './Api';
 import SignIn from './SignIn';
 import ProfileMenu from './ProfileMenu';

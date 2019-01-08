@@ -29,7 +29,16 @@ const styles = theme => ({
   },
 });
 
-const sampleCode = `
+const sampleCode = `/*
+ * You have these functions:
+ *   whoHas(spot) - Who has the requested spot? returns false, 'x', or 'o'
+ *   iAmX() - Returns true if your code is playing X
+ *   moveCount() - Returns the number of moves that have occurred
+ *   mine(...spots) - Returns true if all the spots you specify have your piece in them
+ *   theirs(...spots) - Returns true if all the spots you specify have your opponents piece in them
+ *   firstEmpty(...spots) - Returns the first spot with no piece in it
+ *   winners - an array of arrays of winning patterns (e.g. 1, 2, 3)
+ */
 for (let i = 1; i <= 9; i++) {
   if (!whoHas(i)) {
     return i;
@@ -44,6 +53,7 @@ function defaultState() {
     humanIsX,
     humanIsO: !humanIsX,
     error: null,
+    scoreCounted: false,
   };
 }
 
@@ -51,11 +61,27 @@ class TicTacToe extends React.Component {
   state = {
     ...defaultState(),
     code: sampleCode,
+    computerWins: 0,
+    humanWins: 0,
   }
 
   resetBoard = (e) => {
     e.preventDefault();
     this.setState(defaultState());
+  }
+
+  checkForWin(newState) {
+    const { humanIsO, humanIsX, humanWins, computerWins } = this.state;
+    const newGameState = new GameFunctions(newState.board);
+    const winner = newGameState.won();
+    if (winner) {
+      newState.scoreCounted = true;
+      if ((winner === 'x' && humanIsX) || (winner !== 'x' && humanIsO)) {
+        newState.humanWins = humanWins + 1;
+      } else {
+        newState.computerWins = computerWins + 1;
+      }
+    }
   }
 
   onMove = (spot) => {
@@ -68,11 +94,13 @@ class TicTacToe extends React.Component {
     if ((xMoving && humanIsX) || (!xMoving && humanIsO)) {
       const newBoard = [...board];
       newBoard[spot - 1] = xMoving ? 1 : 2;
-      this.setState({
+      const newState = {
         xMoving: !xMoving,
         board: newBoard,
         error: null,
-      });
+      };
+      this.checkForWin(newState);
+      this.setState(newState);
     }
   }
 
@@ -86,8 +114,8 @@ class TicTacToe extends React.Component {
       const retVal = [];
       const transformed = window.Babel.transform(`retVal[0] = (function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
       // eslint-disable-next-line no-new-func
-      const fn = new Function(...gameState.exposedFunctions, 'retVal', transformed);
-      fn(...gameState.exposedFunctions.map(f => gameState[f]), retVal);
+      const fn = new Function(...gameState.exposedProperties, 'retVal', transformed);
+      fn(...gameState.exposedProperties.map(f => gameState[f]), retVal);
       return retVal[0];
     } catch (error) {
       console.log(error);
@@ -109,20 +137,29 @@ class TicTacToe extends React.Component {
     }
     const newBoard = [...board];
     newBoard[move - 1] = xMoving ? 1 : 2;
-    this.setState({
+    const newState = {
       xMoving: !xMoving,
       board: newBoard,
       error: null,
-    });
+    };
+    this.checkForWin(newState);
+    this.setState(newState);
   }
 
   headlineForState(gameState) {
-    const { board, xMoving, humanIsX, humanIsO, error } = this.state;
+    const { xMoving, humanIsX, humanIsO, error } = this.state;
     const winner = gameState.won();
     if (error) {
       return (
         <div>
           <FontAwesomeIcon icon={xMoving ? faTimes : faDotCircle} /> failed to move.
+        </div>
+      )
+    }
+    if (winner) {
+      return (
+        <div>
+          Game over, <FontAwesomeIcon icon={winner === 'x' ? faTimes : faDotCircle} /> wins.
         </div>
       )
     }
@@ -132,13 +169,6 @@ class TicTacToe extends React.Component {
           This game ends in a tie. Well done.
         </div>
       );
-    }
-    if (winner) {
-      return (
-        <div>
-          Game over, <FontAwesomeIcon icon={xMoving ? faTimes : faDotCircle} /> wins.
-        </div>
-      )
     }
     if ((xMoving && humanIsX) || (!xMoving && humanIsO)) {
       return (
@@ -160,7 +190,7 @@ class TicTacToe extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { board, xMoving, humanIsX, humanIsO, error, code } = this.state;
+    const { board, xMoving, humanIsX, humanIsO, error, code, humanWins, computerWins } = this.state;
     const hasMoves = board.find(v => v !== 0);
     const isComputerMove = ((xMoving && !humanIsX) || (!xMoving && !humanIsO))
     const gameState = new GameFunctions(board);
@@ -199,6 +229,9 @@ class TicTacToe extends React.Component {
                   Make a Move
                 </Button>
               )}
+            </div>
+            <div>
+              Human: {humanWins} Computer: {computerWins}
             </div>
           </Grid>
           <Grid item xs>
