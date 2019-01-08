@@ -34,12 +34,18 @@ class App extends Component {
     this.api.subscribe(this);
   }
 
+  pickedName = () => {
+    const name = window.localStorage.getItem('player.name');
+    this.api.sendBroadcast({ name });
+    this.setState({ name });
+  }
+
   render() {
     const { name } = this.state;
     const { classes } = this.props;
 
     if (!name) {
-      return <SignIn onComplete={() => this.setState({ name: window.localStorage.getItem('player.name') })} />;
+      return <SignIn onComplete={this.pickedName} />;
     }
 
     return (

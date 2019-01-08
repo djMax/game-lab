@@ -10,6 +10,18 @@ function callOptional(subscriber, method, ...args) {
 export default class Api {
   constructor() {
     this.socket = openSocket();
+    this.socket.on('reconnect', () => {
+      const name = window.localStorage.getItem('player.name');
+      if (name) {
+        this.socket.emit(EVENT.Broadcast, { name });
+      }
+    });
+    this.socket.on('connect', () => {
+      const name = window.localStorage.getItem('player.name');
+      if (name) {
+        this.socket.emit(EVENT.Broadcast, { name });
+      }
+    });
   }
 
   subscribe(subscriber) {
