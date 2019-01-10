@@ -69,4 +69,31 @@ export default class Game {
       return true;
     }
   }
+
+  firstAvailable() {
+    // Fallback
+    for (let i = 1; i <= 9; i++) {
+      if (!this.whoHas(i)) {
+        return i;
+      }
+    }
+  }
+
+  random() {
+    for (let i = 0; i < 10000; i++) {
+      const spot = parseInt(Math.random() * 9 + 1, 10);
+      if (!this.whoHas(spot)) {
+        return spot;
+      }
+    }
+    return this.firstAvailable();
+  }
+
+  centerCorner() {
+    const spot = [5, 1, 3, 7, 9].find(s => !this.whoHas(spot));
+    if (spot) {
+      return spot;
+    }
+    return this.firstAvailable();
+  }
 }
