@@ -152,9 +152,14 @@ class TicTacToe extends React.Component {
     const { code } = this.state;
     try {
       const retVal = [];
-      const transformed = window.Babel.transform(`retVal[0] = (function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
-      // eslint-disable-next-line no-new-func
-      const fn = new Function(...gameState.exposedProperties, 'retVal', transformed);
+      let fn = this.cachedFn;
+      if (code !== this.cachedSource || !fn) {
+        const transformed = window.Babel.transform(`retVal[0] = (function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
+        // eslint-disable-next-line no-new-func
+        fn = new Function(...gameState.exposedProperties, 'retVal', transformed);
+        this.cachedFn = fn;
+        this.cachedSource = code;
+      }
       fn(...gameState.exposedProperties.map(f => gameState[f]), retVal);
       return retVal[0];
     } catch (error) {
@@ -395,6 +400,8 @@ class TicTacToe extends React.Component {
                 avatar={<Avatar>{ties}</Avatar>}
                 label="Ties"
               />
+              <br/>
+              <Button onClick={() => this.setState({ player1Wins: 0, player2Wins: 0, ties: 0 })}>Reset Counts</Button>
             </div>
           </Grid>
           <Grid item xs>
