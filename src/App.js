@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import { AppBar, Toolbar, Typography, withStyles } from '@material-ui/core';
+import { BrowserRouter, Switch, Route, withRouter } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, withStyles, IconButton, Menu, MenuItem } from '@material-ui/core';
+import MenuIcon from '@material-ui/icons/Menu';
 import Api from './Api';
 import SignIn from './SignIn';
 import ProfileMenu from './ProfileMenu';
 import TicTacToe from './tic-tac-toe';
+import Playground from './playground';
 
 const styles = {
   root: {
@@ -21,6 +24,10 @@ const styles = {
     '&>div': {
       flex: 1,
     },
+  },
+  menuButton: {
+    marginLeft: -12,
+    marginRight: 20,
   },
 };
 
@@ -40,8 +47,17 @@ class App extends Component {
     this.setState({ name });
   }
 
+  handleClick = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  goFunction = (url) => {
+    const { history } = this.props;
+    return () => this.setState({ anchorEl: null }, () => history.push(url));
+  };
+
   render() {
-    const { name } = this.state;
+    const { name, anchorEl } = this.state;
     const { classes } = this.props;
 
     if (!name) {
@@ -52,6 +68,25 @@ class App extends Component {
       <div className={classes.root}>
         <AppBar position="static">
           <Toolbar>
+            <IconButton
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="Menu"
+              aria-owns={anchorEl ? 'game-menu' : undefined}
+              aria-haspopup="true"
+              onClick={this.handleClick}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id="game-menu"
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={this.handleClose}
+            >
+              <MenuItem onClick={this.goFunction('/tic-tac-toe')}>Tic-Tac-Toe</MenuItem>
+              <MenuItem onClick={this.goFunction('/playground')}>Console Playground</MenuItem>
+            </Menu>
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Advent Game Lab
             </Typography>
@@ -59,11 +94,15 @@ class App extends Component {
           </Toolbar>
         </AppBar>
         <div className={classes.app}>
-          <TicTacToe />
+          <Switch>
+            <Route path="/" exact component={TicTacToe} />
+            <Route path="/tic-tac-toe" exact component={TicTacToe} />
+            <Route path="/playground" exact component={Playground} />
+          </Switch>
         </div>
       </div>
     );
   }
 }
 
-export default withStyles(styles)(App);
+export default withRouter(withStyles(styles)(App));
