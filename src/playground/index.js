@@ -52,8 +52,10 @@ const sampleCode = `/*
  *
  * You must have a "main" function which will be called to run your program.
  */
-const name = await ask('What is your name?');
-print(\`Hello \${name}\`);
+async function main() {
+  const name = await ask('What is your name?');
+  print(\`Hello \${name}\`);
+}
 `;
 
 class Playground extends React.Component {
