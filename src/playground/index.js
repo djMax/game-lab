@@ -73,15 +73,12 @@ class Playground extends React.Component {
 
   accelerator = (key) => {
     if (key === 'r') {
-      console.error('ACCELERATOR');
       setTimeout(this.run, 1);
     }
   }
 
   run = async (e) => {
-    console.error(new Error());
     e && e.preventDefault();
-    e && e.stopPropagation();
     const { code } = this.state;
     await this.consoleRef.current.clear();
     try {
@@ -105,7 +102,6 @@ class Playground extends React.Component {
 
   clear = (e) => {
     e && e.preventDefault();
-    e && e.stopPropagation();
     this.consoleRef.current.clear();
   }
 
