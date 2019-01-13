@@ -49,6 +49,8 @@ const sampleCode = `/*
  * You have these functions:
  *   print(...args) - print the values received
  *   ask(question) - Ask a question and wait for keyboard entry
+ *
+ * You must have a "main" function which will be called to run your program.
  */
 const name = await ask('What is your name?');
 print(\`Hello \${name}\`);
@@ -77,27 +79,33 @@ class Playground extends React.Component {
     }
   }
 
-  run = async (e) => {
+  run = (e) => {
     e && e.preventDefault();
-    const { code } = this.state;
-    await this.consoleRef.current.clear();
-    try {
-      const retVal = [];
-      let fn = this.cachedFn;
-      if (code !== this.cachedSource || !fn) {
-        const transformed = window.Babel.transform(`retVal[0] = (async function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
-        // eslint-disable-next-line no-new-func
-        fn = new Function(...this.exposedProperties, 'retVal', transformed);
-        this.cachedFn = fn;
-        this.cachedSource = code;
-      }
-      fn(...this.exposedProperties.map(f => this[f]), retVal);
-      await retVal[0];
-      this.consoleRef.current.addLine(['', '⏹ Your program has completed.']);
-    } catch (error) {
-      console.log(error);
-      return error.message;
+    const { code, running } = this.state;
+    if (running) {
+      return;
     }
+    this.setState({ running: true }, async () => {
+      await this.consoleRef.current.clear();
+      try {
+        const retVal = [];
+        let fn = this.cachedFn;
+        if (code !== this.cachedSource || !fn) {
+          const transformed = window.Babel.transform(`retVal[0] = (async function yourCode() { ${code} return main(); })()`, { presets: ['es2015'] }).code;
+          // eslint-disable-next-line no-new-func
+          fn = new Function(...this.exposedProperties, 'retVal', transformed);
+          this.cachedFn = fn;
+          this.cachedSource = code;
+        }
+        fn(...this.exposedProperties.map(f => this[f]), retVal);
+        await retVal[0];
+        this.consoleRef.current.addLine(['', '⏹ Your program has completed.']);
+        this.setState({ running: false });
+      } catch (error) {
+        this.setState({ running: false, error });
+        return error.message;
+      }
+    });
   }
 
   clear = (e) => {
@@ -107,7 +115,7 @@ class Playground extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { code, error } = this.state;
+    const { code, error, running } = this.state;
 
     return (
       <div className={classes.root}>
@@ -122,7 +130,7 @@ class Playground extends React.Component {
           </Grid>
           <Grid item xs>
             <div className={classes.buttons}>
-            <Button variant="contained" color="primary" onClick={this.run}>
+            <Button variant="contained" color="primary" onClick={this.run} disabled={!!running}>
               <PlayArrow />
               Run Code
             </Button>
