@@ -37,15 +37,18 @@ export default class Game {
   }
 
   mine = (...spots) => {
-    return spots.every(s => this.whoHas(s) === this.playerValue);
+    let realArray = spots.flat(3);
+    return realArray.every(s => this.whoHas(s) === this.playerValue);
   }
 
   theirs = (...spots) => {
-    return spots.every(s => (this.whoHas(s) && this.whoHas(s) !== this.playerValue));
+    let realArray = spots.flat(3);
+    return realArray.every(s => (this.whoHas(s) && this.whoHas(s) !== this.playerValue));
   }
 
   firstEmpty = (...spots) => {
-    return spots.find(s => !this.whoHas(s));
+    let realArray = spots.flat(3);
+    return realArray.find(s => !this.whoHas(s));
   }
 
   won() {
@@ -90,10 +93,47 @@ export default class Game {
   }
 
   centerCorner() {
-    const spot = [5, 1, 3, 7, 9].find(s => !this.whoHas(spot));
+    const spot = [5, 1, 3, 7, 9].find(s => !this.whoHas(s));
     if (spot) {
       return spot;
     }
     return this.firstAvailable();
+  }
+
+  manualStrategy() {
+    // First block, if needed
+    let blockable = this.winners
+      .find(([a, b, c]) => (
+        (this.theirs(a,b) || this.theirs(b,c) || this.theirs(a,c)) &&
+        this.firstEmpty(a,b,c)));
+
+    if (blockable) {
+      return this.firstEmpty(blockable);
+    }
+
+    // Ok, now is there a place that has two empties and one of our pieces?
+    // If so, let's force them to block
+    let threaten = this.winners
+      .find(([a, b, c]) => {
+        let countMine = this.mine(a) ? 1 : 0 +
+          this.mine(b) ? 1 : 0 +
+          this.mine(c) ? 1 : 0;
+        if (countMine !== 1) {
+          return false;
+        }
+        let countTheirs = this.theirs(a) ? 1 : 0 +
+          this.theirs(b) ? 1 : 0 +
+          this.theirs(c) ? 1 : 0;
+        if (countTheirs > 0) {
+          return false;
+        }
+        return true;
+      });
+
+    if (threaten) {
+      return this.firstEmpty(threaten);
+    }
+
+    return this.firstEmpty(5, 1, 3, 7, 9, 2, 4, 6, 8);
   }
 }

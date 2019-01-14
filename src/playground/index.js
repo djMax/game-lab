@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Typography, withStyles, Grid, Button } from '@material-ui/core';
+import { Typography, withStyles, Grid, Button, Select, MenuItem } from '@material-ui/core';
 import PlayArrow from '@material-ui/icons/PlayArrow';
 import ClearIcon from '@material-ui/icons/Clear';
 import Editor from '../editor';
 import Console from './Console';
+import { Subscribe } from 'unstated';
+import MultiplayerContainer from '../common/MultiplayerContainer';
 
 const styles = theme => ({
   root: {
@@ -41,7 +43,15 @@ const styles = theme => ({
       margin: theme.spacing.unit,
     },
   },
+  invisible: {
+    display: 'none',
+  },
 });
+
+function othersWithCode(mp) {
+  const withCode = Object.entries(mp.state.others).filter(([id, s]) => s.playground);
+  return withCode.length ? withCode : null;
+}
 
 const sampleCode = `/*
  * This playground supports printing and getting data from the console
@@ -70,15 +80,25 @@ class Playground extends React.Component {
     this.consoleRef = React.createRef();
   }
 
-  saveCode = (code) => {
+  onCodeChange = (code) => {
     this.setState({ code });
     window.localStorage.setItem('playground.code', code);
+  }
+
+  onCodeCommit = (multiplayer) => {
+    const { code } = this.state;
+    multiplayer.newCode('playground', code);
   }
 
   accelerator = (key) => {
     if (key === 'r') {
       setTimeout(this.run, 1);
     }
+  }
+
+  copyFrom = ({ target: { value } }) => {
+    const { code } = this.state;
+    this.setState({ code: value, revert: code });
   }
 
   run = (e) => {
@@ -117,34 +137,66 @@ class Playground extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { code, error, running } = this.state;
+    const { code, error, running, revert } = this.state;
 
     return (
-      <div className={classes.root}>
-        <Grid container spacing={24}>
-          <Grid item xs>
-            {error && (
-              <Typography variant="body1" className={classes.message}>
-                {error}
-              </Typography>
-            )}
-            <Console innerRef={this.consoleRef} onCtrl={this.accelerator} />
+      <Subscribe to={[MultiplayerContainer]}>
+      {multiplayer => (
+        <div className={classes.root}>
+          <Grid container spacing={24}>
+            <Grid item xs>
+              {error && (
+                <Typography variant="body1" className={classes.message}>
+                  {error}
+                </Typography>
+              )}
+              <Console innerRef={this.consoleRef} onCtrl={this.accelerator} />
+            </Grid>
+            <Grid item xs>
+              <div className={classes.buttons}>
+                <Button variant="contained" color="primary" onClick={this.run} disabled={!!running}>
+                  <PlayArrow />
+                  Run Code
+                </Button>
+                <Button variant="contained" color="secondary" onClick={this.clear}>
+                  <ClearIcon />
+                  Clear Output
+                </Button>
+                {othersWithCode(multiplayer) && (
+                  <Select
+                    displayEmpty
+                    className={classes.formControl}
+                    onChange={this.copyFrom}
+                    value="-"
+                    inputProps={{
+                      id: 'copy-simple',
+                    }}
+                  >
+                    <MenuItem value="-" className={classes.invisible}>Copy code from...</MenuItem>
+                    {othersWithCode(multiplayer).map(([id, { name, playground }]) => (
+                      <MenuItem key={id} value={playground}>{name}</MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </div>
+              <Editor
+                code={code}
+                onChange={this.onCodeChange}
+                onCommit={() => this.onCodeCommit(multiplayer)}
+              />
+              {revert && (
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.setState({ revert: null, code: revert });
+                  }}
+                >Restore Previous Code</Button>
+              )}
+            </Grid>
           </Grid>
-          <Grid item xs>
-            <div className={classes.buttons}>
-            <Button variant="contained" color="primary" onClick={this.run} disabled={!!running}>
-              <PlayArrow />
-              Run Code
-            </Button>
-            <Button variant="contained" color="secondary" onClick={this.clear}>
-              <ClearIcon />
-              Clear Output
-            </Button>
-            </div>
-            <Editor code={code} onChange={this.saveCode} />
-          </Grid>
-        </Grid>
-      </div>
+        </div>
+      )}
+      </Subscribe>
     );
   }
 

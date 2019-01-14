@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, withStyles, IconButton, Menu, MenuItem } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import Api from './Api';
-import SignIn from './SignIn';
+import SignIn from './common/SignIn';
 import ProfileMenu from './ProfileMenu';
 import TicTacToe from './tic-tac-toe';
 import Playground from './playground';
+import MultiplayerContainer from './common/MultiplayerContainer';
+import { Subscribe } from 'unstated';
 
 const styles = {
   root: {
@@ -33,36 +34,19 @@ const styles = {
 
 class App extends Component {
   state = {
-    name: window.localStorage.getItem('player.name'),
+    others: {},
   }
 
-  componentDidMount() {
-    this.api = new Api();
-    this.api.subscribe(this);
-  }
-
-  pickedName = () => {
-    const name = window.localStorage.getItem('player.name');
-    this.api.sendBroadcast({ name });
-    this.setState({ name });
-  }
-
-  handleClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
+  handleClick = event => this.setState({ anchorEl: event.currentTarget });
 
   goFunction = (url) => {
     const { history } = this.props;
     return () => this.setState({ anchorEl: null }, () => history.push(url));
-  };
+  }
 
-  render() {
-    const { name, anchorEl } = this.state;
+  renderContainer() {
+    const { anchorEl, others } = this.state;
     const { classes } = this.props;
-
-    if (!name) {
-      return <SignIn onComplete={this.pickedName} />;
-    }
 
     return (
       <div className={classes.root}>
@@ -90,17 +74,25 @@ class App extends Component {
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Advent Game Lab
             </Typography>
-            <ProfileMenu />
+            <ProfileMenu others={others} />
           </Toolbar>
         </AppBar>
         <div className={classes.app}>
           <Switch>
             <Route path="/" exact component={TicTacToe} />
-            <Route path="/tic-tac-toe" exact component={TicTacToe} />
+            <Route path="/tic-tac-toe" exact component={TicTacToe} others={others} />
             <Route path="/playground" exact component={Playground} />
           </Switch>
         </div>
       </div>
+    );
+  }
+
+  render() {
+    return (
+      <Subscribe to={[MultiplayerContainer]}>
+      {multiplayer => (multiplayer.state.name ? this.renderContainer() : <SignIn />)}
+      </Subscribe>
     );
   }
 }

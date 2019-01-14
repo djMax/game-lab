@@ -16,6 +16,10 @@ class CodeEditor extends React.Component {
     this.props.onChange(code);
   }
 
+  onCommit = () => {
+    this.props.onCommit();
+  }
+
   render() {
     const { classes, code } = this.props;
 
@@ -27,6 +31,7 @@ class CodeEditor extends React.Component {
           name="codeEditor"
           onLoad={this.onLoad}
           onChange={this.onChange}
+          onBlur={this.onCommit}
           fontSize={14}
           showPrintMargin={true}
           showGutter={true}
@@ -34,8 +39,8 @@ class CodeEditor extends React.Component {
           value={code}
           width="100%"
           setOptions={{
-            enableBasicAutocompletion: false,
-            enableLiveAutocompletion: true,
+            enableBasicAutoCompletion: false,
+            enableLiveAutoCompletion: true,
             enableSnippets: true,
             showLineNumbers: true,
             tabSize: 2,

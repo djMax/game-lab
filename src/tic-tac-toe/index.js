@@ -7,6 +7,8 @@ import Board from './Board';
 import Editor from '../editor';
 import GameFunctions from './game-functions';
 import PlayerTypeMenu from './PlayerTypeMenu';
+import { Subscribe } from 'unstated';
+import MultiplayerContainer from '../common/MultiplayerContainer';
 
 const styles = theme => ({
   root: {
@@ -106,7 +108,7 @@ class TicTacToe extends React.Component {
   }
 
   run100 = () => {
-    this.setState({ games: 100, autoMove: true }, () => {
+    this.setState({ games: 99, autoMove: true }, () => {
       this.nonHumanMove();
     });
   }
@@ -143,27 +145,32 @@ class TicTacToe extends React.Component {
     this.applyMove(spot);
   }
 
-  saveCode = (code) => {
+  onCodeChange = (code) => {
     this.setState({ code });
     window.localStorage.setItem('tictactoe.code', code);
   }
 
-  async runMove(gameState) {
+  onCodeCommit = (multiplayer) => {
     const { code } = this.state;
+    multiplayer.newCode('tictactoe', code);
+  }
+
+  async runMove(gameState, code, cacheName) {
     try {
       const retVal = [];
-      let fn = this.cachedFn;
-      if (code !== this.cachedSource || !fn) {
+      const cacheInfo = (this.cache && this.cache[cacheName]) || {};
+      if (!cacheInfo || code !== cacheInfo.code || !cacheInfo.fn) {
         const transformed = window.Babel.transform(`retVal[0] = (function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
         // eslint-disable-next-line no-new-func
-        fn = new Function(...gameState.exposedProperties, 'retVal', transformed);
-        this.cachedFn = fn;
-        this.cachedSource = code;
+        cacheInfo.fn = new Function(...gameState.exposedProperties, 'retVal', transformed);
+        this.cache = this.cache || {};
+        cacheInfo.code = code;
+        this.cache[cacheName] = cacheInfo;
       }
-      fn(...gameState.exposedProperties.map(f => gameState[f]), retVal);
+      cacheInfo.fn(...gameState.exposedProperties.map(f => gameState[f]), retVal);
       return retVal[0];
     } catch (error) {
-      console.log(error);
+      console.log('Move failed', error);
       return error.message;
     }
   }
@@ -197,14 +204,13 @@ class TicTacToe extends React.Component {
     });
   }
 
-  computerMove = async (e) => {
-    e && e.preventDefault();
+  computerMove = async (code, cacheName) => {
     const { board, xMoving } = this.state;
     const gameState = new GameFunctions(board, xMoving ? 'x' : 'o');
     if (gameState.done() || gameState.won()) {
       return;
     }
-    const rawMove = await this.runMove(gameState);
+    const rawMove = await this.runMove(gameState, code, cacheName);
     const move = parseInt(rawMove, 10);
     if (Number.isNaN(move) || gameState.whoHas(move) !== false || move < 1 || move > 9) {
       this.setState({
@@ -218,7 +224,7 @@ class TicTacToe extends React.Component {
 
   nonHumanMove() {
     const type = this.whoseMove();
-    const { board, xMoving } = this.state;
+    const { board, xMoving, code } = this.state;
     const gameState = new GameFunctions(board, xMoving ? 'x' : 'o');
     switch (type) {
       case 'random':
@@ -227,8 +233,11 @@ class TicTacToe extends React.Component {
       case 'centerCorner':
         this.applyMove(gameState.centerCorner());
         return;
+      case 'code':
+        this.computerMove(code, 'self');
+        return;
       default:
-        this.computerMove();
+        this.computerMove(type, 'opponent');
         return;
     }
   }
@@ -287,7 +296,7 @@ class TicTacToe extends React.Component {
     );
   }
 
-  render() {
+  renderWithMultiplayer(multiplayer) {
     const { classes } = this.props;
     const {
       board, error, code, player1Wins, player2Wins,
@@ -344,7 +353,7 @@ class TicTacToe extends React.Component {
                       <Button
                         variant="contained"
                         className={classes.button}
-                        onClick={this.computerMove}
+                        onClick={(e) => { e.preventDefault(); this.computerMove(); }}
                       >
                         Start
                       </Button>
@@ -373,7 +382,7 @@ class TicTacToe extends React.Component {
                   <Button
                     variant="contained"
                     className={classes.button}
-                    onClick={this.computerMove}
+                    onClick={(e) => { e.preventDefault(); this.computerMove(); }}
                   >
                     Make a Move
                   </Button>
@@ -405,11 +414,19 @@ class TicTacToe extends React.Component {
             </div>
           </Grid>
           <Grid item xs>
-            <Editor code={code} onChange={this.saveCode} />
+            <Editor
+              code={code}
+              onChange={this.onCodeChange}
+              onCommit={() => this.onCodeCommit(multiplayer)}
+            />
           </Grid>
         </Grid>
       </div>
     );
+  }
+
+  render() {
+    return <Subscribe to={[MultiplayerContainer]}>{mp => this.renderWithMultiplayer(mp)}</Subscribe>;
   }
 }
 TicTacToe.propTypes = {
