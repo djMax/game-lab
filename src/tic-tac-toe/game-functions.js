@@ -1,3 +1,9 @@
+const winners = [
+  [1,2,3],[4,5,6],[7,8,9],
+  [1,4,7],[2,5,8],[3,6,9],
+  [1,5,9],[7,5,3],
+];
+
 /**
  * Answer details about the current game state
  */
@@ -5,13 +11,8 @@ export default class Game {
   constructor(board, playerValue) {
     this.board = board;
     this.playerValue = playerValue;
+    this.winners = winners;
   }
-
-  winners = [
-    [1,2,3],[4,5,6],[7,8,9],
-    [1,4,7],[2,5,8],[3,6,9],
-    [1,5,9],[7,5,3],
-  ]
 
   exposedProperties = ['whoHas', 'mine', 'theirs', 'winners', 'firstEmpty', 'iAmX', 'moveCount'];
 
@@ -51,12 +52,18 @@ export default class Game {
     return realArray.find(s => !this.whoHas(s));
   }
 
+  empty = () => {
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(s => !this.board[s - 1]);
+  }
+
+  boardWithMove(spot, isX) {
+    const newBoard = this.board.slice(0);
+    newBoard[spot - 1] = isX ? 1 : 2;
+    return new Game(newBoard, isX ? 'o' : 'x');
+  }
+
   won() {
-    const winning = [
-      [1,2,3],[4,5,6],[7,8,9],
-      [1,4,7],[2,5,8],[3,6,9],
-      [1,5,9],[7,5,3],
-    ].find(([a, b, c]) => {
+    const winning = winners.find(([a, b, c]) => {
       return this.whoHas(a)
         && this.whoHas(a) === this.whoHas(b)
         && this.whoHas(b) === this.whoHas(c);
@@ -135,5 +142,44 @@ export default class Game {
     }
 
     return this.firstEmpty(5, 1, 3, 7, 9, 2, 4, 6, 8);
+  }
+
+  minimax(xIsMoving, xIsAsking, depth = 0) {
+    const won = this.won();
+    if (won) {
+      // The requestor won
+      if ((xIsAsking && won === 'x') || (!xIsAsking && won === 'o')) {
+        return 100 - depth;
+      }
+      // The requester lost
+      return -100 + depth;
+    }
+    if (this.done()) {
+      return 0;
+    }
+
+    const maximizing = ((xIsAsking && xIsMoving) || (!xIsAsking && !xIsMoving))
+    let best = maximizing ? -100 : 100;
+    let bestSpot;
+
+    this.empty().forEach((newMove) => {
+      const newState = this.boardWithMove(newMove, xIsMoving);
+      const nodeValue = newState.minimax(!xIsMoving, xIsAsking, depth + 1);
+      if (maximizing) {
+        if (nodeValue > best) {
+          best = nodeValue;
+          bestSpot = newMove;
+        }
+      } else {
+        if (nodeValue < best) {
+          best = nodeValue;
+          bestSpot = newMove;
+        }
+      }
+    });
+    if (depth === 0) {
+      return bestSpot;
+    }
+    return best;
   }
 }

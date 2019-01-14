@@ -40,6 +40,7 @@
   ],
   "proxy": "http://localhost:8000/",
   "devDependencies": {
+    "@babel/register": "^7.0.0",
     "pino-pretty": "^2.5.0"
   }
 }

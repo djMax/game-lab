@@ -29,6 +29,9 @@ export default ({ className, index, isX, value, onChange }) => (
         <MenuItem value="centerCorner">
           <em>Centers/Corners</em>
         </MenuItem>
+        <MenuItem value="minimax">
+          <em>Minmax</em>
+        </MenuItem>
         {Object.entries(multiplayer.state.others)
           .filter(([id, s]) => s.tictactoe)
           .map(([id, { name, tictactoe }]) => (

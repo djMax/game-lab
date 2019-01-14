@@ -233,6 +233,9 @@ class TicTacToe extends React.Component {
       case 'centerCorner':
         this.applyMove(gameState.centerCorner());
         return;
+      case 'minimax':
+        this.applyMove(gameState.minimax(xMoving, xMoving));
+        return;
       case 'code':
         this.computerMove(code, 'self');
         return;
