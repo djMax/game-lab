@@ -133,7 +133,7 @@ export default Game({
           G.lastWinner = winner;
         },
         endPhaseIf(G) {
-          return G.board.ack === G.playerTypes.filter(p => p.startsWith('human')).length;
+          return G.board.ack >= G.playerTypes.filter(p => p.startsWith('human')).length;
         },
       },
     },
