@@ -5,7 +5,7 @@ import Piece from './Piece';
 import LogicalHand from '../models/LogicalHand';
 
 const Hand = ({ classes, pieces, name, last, active, onClick, onPass, ...rest }) => {
-  let finalHand = Array.isArray(pieces) ? LogicalHand.sorted(pieces) : Array(pieces).fill({ values: [undefined, undefined] });
+  let finalHand = Array.isArray(pieces) ? pieces : Array(pieces).fill({ values: [undefined, undefined] });
   let lastPlayed;
   if (!Array.isArray(pieces) && last && !active) {
     lastPlayed = last === 'pass' ? 'Passed' : `Last play ${last.values[0]}/${last.values[1]}`;

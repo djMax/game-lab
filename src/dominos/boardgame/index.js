@@ -78,7 +78,7 @@ export default Game({
           G.players = LogicalHand
             .deal(() => ctx.random.Shuffle(LogicalBoard.allDominos))
             .reduce((map, hand, ix) => {
-              map[ix] = { hand };
+              map[ix] = { hand: LogicalHand.sorted(hand) };
               return map;
             }, {});
           G.pieces = [7, 7, 7, 7];

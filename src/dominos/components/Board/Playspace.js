@@ -8,10 +8,11 @@ const styles = {
   root: {
     position: 'absolute',
     fontSize: 8,
-    top: '18em',
+    top: '16em',
     left: '23em',
-    bottom: '23em',
+    bottom: '16em',
     right: '23em',
+    maxHeight: '70em',
     '&>div': {
       position: 'absolute',
       transformOrigin: 'center center',
