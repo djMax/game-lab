@@ -85,9 +85,11 @@ class CodeEditor extends React.Component {
             }}
           />
         )}
-        <div className={classes.button}>
-          <Button onClick={this.toggleMode}>Switch to {useBlocks ? 'Javascript Editor' : 'Block Editor'}</Button>
-        </div>
+        {false && (
+          <div className={classes.button}>
+            <Button onClick={this.toggleMode}>Switch to {useBlocks ? 'Javascript Editor' : 'Block Editor'}</Button>
+          </div>
+        )}
       </div>
     );
   }
