@@ -25,7 +25,9 @@ export default function addHelpers({ app }) {
   });
 
   router.get('*', async ctx => {
-    koaSend(ctx, path.join(__dirname, '..', 'build', 'index.html'))
+    await koaSend(ctx, path.join('build', 'index.html'), {
+      root: path.resolve(path.join(__dirname, '..')),
+    });
   });
 
   app.use(router.routes()).use(router.allowedMethods());
