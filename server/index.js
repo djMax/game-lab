@@ -1,22 +1,26 @@
 const logger = require('pino')();
+require('@babel/register');
+
 const path = require('path');
-const express = require('express');
-const app = express();
-
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const Server = require('@djmax/boardgame.io/server').Server;
+const Dominos = require('../src/dominos/boardgame').default;
+const addHelpers = require('./helperApi').default;
 const { Connection } = require('./Connection');
+const server = Server({ games: [Dominos], singlePort: true });
 
-io.on('connection', (client) => {
-  Connection.createConnection(client);
+const port = Number(process.env.PORT || 8000);
+
+logger.info('Starting server', { port });
+server.run(port, () => {
+  logger.info('Ready');
 });
 
-// This stuff serves the built React app in production
-app.use(express.static(path.join(__dirname, '..', 'build')));
+server.app._io.on('connection', (socket) => Connection.createConnection(socket));
 
-app.get('*', function(req, res) {
-  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+// This serves the built React app in production
+server.app.use(require('koa-static')(path.join(__dirname, '..', 'build')));
+addHelpers({ app: server.app });
+
+process.on('unhandledRejection', error => {
+  console.log(error);
 });
-
-const port = process.env.PORT || 8000
-server.listen(port, () => logger.info('Server listening', { port }));

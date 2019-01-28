@@ -6,11 +6,13 @@ import SignIn from './common/SignIn';
 import ProfileMenu from './ProfileMenu';
 import TicTacToe from './tic-tac-toe';
 import Playground from './playground';
+import Dominos from './dominos';
 import MultiplayerContainer from './common/MultiplayerContainer';
 import { Subscribe } from 'unstated';
 
 const styles = {
   root: {
+    overflowX: 'hidden',
     minHeight: '100vh',
     flexGrow: 1,
   },
@@ -20,6 +22,7 @@ const styles = {
   app: {
     display: 'flex',
     flexDirection: 'column',
+    flexGrow: 1,
     margin: 10,
 
     '&>div': {
@@ -69,6 +72,7 @@ class App extends Component {
               onClose={this.handleClose}
             >
               <MenuItem onClick={this.goFunction('/tic-tac-toe')}>Tic-Tac-Toe</MenuItem>
+              <MenuItem onClick={this.goFunction('/dominos')}>Dominos</MenuItem>
               <MenuItem onClick={this.goFunction('/playground')}>Console Playground</MenuItem>
             </Menu>
             <Typography variant="h6" color="inherit" className={classes.grow}>
@@ -82,6 +86,7 @@ class App extends Component {
             <Route path="/" exact component={TicTacToe} />
             <Route path="/tic-tac-toe" exact component={TicTacToe} others={others} />
             <Route path="/playground" exact component={Playground} />
+            <Route path="/dominos" exact component={Dominos} />
           </Switch>
         </div>
       </div>
