@@ -34,6 +34,7 @@ export default Game({
       master,
       playerTypes: players || ['human', 'highest', 'highest', 'highest'],
       players: {},
+      lastPlay: [],
       pieces: [0, 0, 0, 0],
     };
   },
@@ -157,10 +158,13 @@ export default Game({
       }
       G.pieces[player] = G.pieces[player] - 1;
       G.players[player].hand = G.players[player].hand.filter(p => !LogicalPiece.isSamePiece(p, piece));
+      G.lastPlay[player] = piece;
     },
 
     pass(G, ctx) {
       // TODO make sure they really pass
+      const player = Number(ctx.currentPlayer);
+      G.lastPlay[player] = 'pass';
     },
 
     deferStart(G, ctx) {

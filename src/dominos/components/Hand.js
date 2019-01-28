@@ -4,8 +4,12 @@ import { Button, withStyles } from '@material-ui/core';
 import Piece from './Piece';
 import LogicalHand from '../models/LogicalHand';
 
-const Hand = ({ classes, pieces, name, active, onClick, onPass, ...rest }) => {
+const Hand = ({ classes, pieces, name, last, active, onClick, onPass, ...rest }) => {
   let finalHand = Array.isArray(pieces) ? LogicalHand.sorted(pieces) : Array(pieces).fill({ values: [undefined, undefined] });
+  let lastPlayed;
+  if (!Array.isArray(pieces) && last && !active) {
+    lastPlayed = last === 'pass' ? 'Passed' : `Last play ${last.values[0]}/${last.values[1]}`;
+  }
   return (
     <div className={classnames(classes.root, { [classes.active]: active })} {...rest}>
       {finalHand.map((p, ix) => <Piece
@@ -14,6 +18,7 @@ const Hand = ({ classes, pieces, name, active, onClick, onPass, ...rest }) => {
         second={p.values[1]}
         onClick={() => (onClick && onClick(p))}
       />)}
+      {lastPlayed && <div className={classes.lastPlay}>{lastPlayed}</div>}
       <div className={classes.name}>{name}</div>
       {onPass && <Button variant="contained" onClick={onPass}>
         Pass
@@ -30,6 +35,15 @@ export default withStyles({
     bottom: 0,
     padding: '.25em',
     borderRadius: 6,
+  },
+  lastPlay: {
+    position: 'absolute',
+    top: '2.4em',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    color: 'rgba(0, 0, 0, .75)',
+    fontSize: '2em',
+    borderRadius: 10,
+    padding: 7,
   },
   active: {
     backgroundColor: 'pink',

@@ -51,7 +51,7 @@ class Board extends React.Component {
   }
 
   renderHand = (playerToRender) => {
-    const { ctx: { phase, currentPlayer }, playerID, isActive, G: { names, board, players, pieces }, classes } = this.props;
+    const { ctx: { phase, currentPlayer }, playerID, isActive, G: { names, board, players, pieces, lastPlay }, classes } = this.props;
     const { piece } = this.state;
     const handProps = {};
     if (String(playerToRender) === String(playerID) && phase === 'play') {
@@ -66,6 +66,7 @@ class Board extends React.Component {
     if (currentPlayer === String(playerToRender)) {
       handProps.active = true;
     }
+    handProps.last = lastPlay[playerToRender];
     return (
       <div className={classnames(classes.hand, classes[`p${playerToRender}`])}>
         <Hand
