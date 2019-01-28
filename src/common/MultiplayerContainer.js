@@ -18,6 +18,10 @@ export default class MultiplayerContainer extends Container {
     }
   }
 
+  get id() {
+    return api.socket.id;
+  }
+
   tearDownApi = () => {
     if (api) {
       api.unsubscribe(subs);
@@ -49,8 +53,19 @@ export default class MultiplayerContainer extends Container {
     });
   }
 
+  broadcast = (message) => {
+    api.sendBroadcast(message);
+  }
+
   onBroadcast(id, message) {
     switch (message.type) {
+      case 'NewGame':
+        if (message.players.includes(`human:${api.socket.id}`)) {
+          this.setState({
+            newGame: message,
+          });
+        }
+        break;
       default:
         console.log('Unknown message', message);
         break;
@@ -66,7 +81,6 @@ export default class MultiplayerContainer extends Container {
         ...state,
       };
     });
-    console.error('UPDATED', updatedOthers);
     this.setState({ others: updatedOthers });
   }
 }

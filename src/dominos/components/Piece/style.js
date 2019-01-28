@@ -2,7 +2,7 @@ export default {
   domino: {
     width: '6em',
     height: '12em',
-    margin: 10,
+    margin: '.5em',
     position: 'relative',
     borderRadius: '.8em',
     boxShadow: '.3em .3em 0em .2em #333',

@@ -23,13 +23,15 @@ export default Game({
     return r;
   },
 
-  setup(ctx, { players } = {}) {
+  setup(ctx, { players, names, master } = {}) {
     return {
       secret: {},
       scores: {
         ns: 0,
         ew: 0,
       },
+      names,
+      master,
       playerTypes: players || ['human', 'highest', 'highest', 'highest'],
       players: {},
       pieces: [0, 0, 0, 0],
@@ -47,6 +49,11 @@ export default Game({
           first(G, ctx) {
             if (ctx.phase === 'score') {
               return 0;
+            }
+
+            if (G.lastWinner !== undefined) {
+              console.log('Last winner starts', G.lastWinner);
+              return String(G.lastWinner);
             }
 
             // TODO if some team won, let them start
@@ -77,7 +84,7 @@ export default Game({
           G.board = { root: null, left: [], right: [] };
         },
         endPhaseIf(G, ctx) {
-          return LogicalBoard(G.board).didGameEnd() !== LogicalBoard.GameEnd.None;
+          return new LogicalBoard(G.board).didGameEnd() !== LogicalBoard.GameEnd.None;
         },
         next: 'score',
       },
@@ -101,6 +108,7 @@ export default Game({
               const thisPlayer = (Number(ctx.currentPlayer) + i) % ctx.playOrder.length;
               if (pointTotals[thisPlayer] < minScore) {
                 winner = thisPlayer;
+                minScore = pointTotals[thisPlayer];
               }
             }
           } else {
@@ -121,6 +129,10 @@ export default Game({
             };
             G.scores.ew += G.completed.points;
           }
+          G.lastWinner = winner;
+        },
+        endPhaseIf(G) {
+          return G.board.ack === G.playerTypes.filter(p => p.startsWith('human')).length;
         },
       },
     },
@@ -156,7 +168,6 @@ export default Game({
     },
 
     continue(G, ctx) {
-      console.log('Continue called');
       G.board.ack = (G.board.ack || 0) + 1;
     }
   },

@@ -48,9 +48,9 @@ export default class LogicalBoard {
     const playerPieceCount = [7, 7, 7, 7];
     const readPiece = (p) => {
       playerPieceCount[p.by] -= 1;
-      pieceCount[p.values[0]] -= 1;
+      pieceCount[p.values[0]] += 1;
       if (!LogicalPiece.isDouble(p)) {
-        pieceCount[p.values[1]] -= 1;
+        pieceCount[p.values[1]] += 1;
       }
     };
     readPiece(root);
@@ -59,7 +59,9 @@ export default class LogicalBoard {
     if (playerPieceCount.includes(0)) {
       return LogicalBoard.GameEnd.PlayerEmpty;
     }
-    if (pieceCount[this.leftOption] === 0 || pieceCount[this.rightOption] === 0) {
+    console.error('PIECE COUNT', pieceCount);
+    console.error('options', this.leftOption, this.rightOption);
+    if (pieceCount[this.leftOption] === 7 || pieceCount[this.rightOption] === 7) {
       return LogicalBoard.GameEnd.Closed;
     }
     return LogicalBoard.GameEnd.None;
