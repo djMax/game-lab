@@ -22,6 +22,7 @@ const styles = {
   code: {
     width: '65vw',
     minWidth: 500,
+    maxWidth: 800,
     padding: 50,
   },
   expander: {
@@ -190,7 +191,7 @@ class Dominos extends React.Component {
 
         {gameID ? <DominoClient playerID={playerID} gameID={gameID} credentials={credentials} /> : <OrganizeGame onReady={this.startGame} />}
 
-        <Drawer anchor="right" open={codeOpen} onClose={this.closeCode}>
+        <Drawer anchor="right" open={codeOpen} onClose={this.closeCode} variant="persistent">
           <div className={classes.code}>
             <Editor
               code={code}
