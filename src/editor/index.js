@@ -1,7 +1,6 @@
 /* globals Blockly */
 import React from 'react';
 import AceEditor from 'react-ace';
-import Safe from 'react-safe';
 
 import 'brace/mode/javascript';
 import 'brace/theme/monokai';

@@ -8,11 +8,11 @@ const styles = {
   root: {
     position: 'absolute',
     fontSize: 8,
-    top: '16em',
+    top: '17em',
     left: '23em',
     bottom: '16em',
     right: '23em',
-    maxHeight: '70em',
+    maxHeight: '60em',
     '&>div': {
       position: 'absolute',
       transformOrigin: 'center center',
@@ -55,15 +55,15 @@ class Playspace extends React.Component {
     const { root, left, right, classes } = this.props;
 
     const rootTransform = { zIndex: 29 };
-    const start = { y: -12, rx: 0, lx: 0 };
+    const start = {};
     const maxSequence = root ? [root, ...left || [], ...right || []].reduce((prev, cur) => Math.max(prev, cur.sequence), 0) : 0;
 
     if (root && LogicalPiece.isDouble(root)) {
-      rootTransform.transform = 'translate(-2em,-12em)';
-      Object.assign(start, { rx: 7.6, lx: 1, y: -12 });
+      rootTransform.transform = 'translate(-2em,-6em)';
+      Object.assign(start, { rx: 7.6, lx: 1, y: -6 });
     } else {
-      rootTransform.transform = 'rotate(90deg) translate(-12em,0em)';
-      Object.assign(start, { rx: 12.5, lx: -0.5, y: -12 });
+      rootTransform.transform = 'rotate(90deg) translate(-6em,0em)';
+      Object.assign(start, { rx: 12.5, lx: -0.5, y: -6 });
     }
 
     const leftLayout = new Layout({ left: true, max: 45, up: true, x: start.lx, y: start.y });

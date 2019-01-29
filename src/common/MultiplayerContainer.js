@@ -53,6 +53,10 @@ export default class MultiplayerContainer extends Container {
     });
   }
 
+  clearBroadcast = () => {
+    this.setState({ newGame: null });
+  }
+
   broadcast = (message) => {
     api.sendBroadcast(message);
   }
