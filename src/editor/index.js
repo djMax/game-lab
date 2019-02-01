@@ -2,13 +2,13 @@
 import React from 'react';
 import AceEditor from 'react-ace';
 import Toolbox from './toolbox';
+import ScratchVM from 'scratch-vm';
+import Target from 'scratch-vm/src/engine/target';
 
 import 'brace/mode/javascript';
 import 'brace/theme/monokai';
-import 'blockly/blocks_compressed';
 
 import { withStyles, Button } from '@material-ui/core';
-
 
 const styles = {
   root: {
@@ -44,8 +44,12 @@ class CodeEditor extends React.Component {
     this.setState({ useBlocks: !useBlocks })
   }
 
+  greenFlag = () => {
+    window.blocklyVm.greenFlag();
+  }
+
   render() {
-    const { classes, code } = this.props;
+    const { classes, code, offerBlocks } = this.props;
     const { useBlocks } = this.state;
 
     if (useBlocks && !window.blocklyWorkspace) {
@@ -69,6 +73,37 @@ class CodeEditor extends React.Component {
             dragShadowOpacity: 0.6
           },
         });
+        const vm = new ScratchVM();
+        window.blocklyWorkspace.addChangeListener((a) => console.log('CHANGE L', a));
+        window.blocklyWorkspace.addChangeListener(vm.blockListener);
+        window.blocklyWorkspace.addChangeListener(vm.variableListener);
+        vm.addListener('PROJECT_START', () => {
+          console.error('PROJECT_START STARTED');
+        });
+        vm.addListener('PROJECT_RUN_START', () => {
+          console.error('PROJECT_RUN_START');
+        });
+        vm.addListener('PROJECT_RUN_STOP', () => {
+          console.error('PROJECT_RUN_STOP');
+        });
+        vm.addListener('PROJECT_CHANGED', () => {
+          console.error('PROJECT_CHANGED');
+        });
+        vm.addListener('targetsUpdate', (...args) => {
+          console.error('targetsUpdate', args);
+        });
+        const target = new Target(vm.runtime);
+        target.id = 'Game_Target';
+        target.onStopAll = () => {
+          console.error('STOP ALL');
+        };
+        target.setCustomState = (stateId, newValue) => {
+          console.error('SET STATE', stateId, newValue);
+        };
+        target.sprite = {};
+        vm.runtime.targets = [target];
+        vm.start();
+        window.blocklyVm = vm;
       }, 250);
     }
 
@@ -101,9 +136,11 @@ class CodeEditor extends React.Component {
             }}
           />
         )}
-        <div className={classes.button}>
-          <Button onClick={this.toggleMode}>Switch to {useBlocks ? 'Javascript Editor' : 'Block Editor'}</Button>
-        </div>
+        {offerBlocks && (
+          <div className={classes.button}>
+            <Button onClick={this.toggleMode}>Switch to {useBlocks ? 'Javascript Editor' : 'Block Editor'}</Button>
+          </div>
+        )}
         <Toolbox />
       </div>
     );

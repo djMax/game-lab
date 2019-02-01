@@ -9,6 +9,7 @@ import Playground from './playground';
 import Dominos from './dominos';
 import MultiplayerContainer from './common/MultiplayerContainer';
 import { Subscribe } from 'unstated';
+import ConnectFour from './connect-four';
 
 const styles = {
   root: {
@@ -72,6 +73,7 @@ class App extends Component {
               onClose={this.handleClose}
             >
               <MenuItem onClick={this.goFunction('/tic-tac-toe')}>Tic-Tac-Toe</MenuItem>
+              <MenuItem onClick={this.goFunction('/connect-four')}>Connect Four</MenuItem>
               <MenuItem onClick={this.goFunction('/dominos')}>Dominos</MenuItem>
               <MenuItem onClick={this.goFunction('/playground')}>Console Playground</MenuItem>
             </Menu>
@@ -87,6 +89,7 @@ class App extends Component {
             <Route path="/tic-tac-toe" exact component={TicTacToe} others={others} />
             <Route path="/playground" exact component={Playground} />
             <Route path="/dominos" exact component={Dominos} />
+            <Route path="/connect-four" exact component={ConnectFour} />
           </Switch>
         </div>
       </div>

@@ -4,9 +4,10 @@ require('@babel/register');
 const path = require('path');
 const Server = require('@djmax/boardgame.io/server').Server;
 const Dominos = require('../src/dominos/boardgame').default;
+const ConnectFour = require('../src/connect-four/boardgame').default;
 const addHelpers = require('./helperApi').default;
 const { Connection } = require('./Connection');
-const server = Server({ games: [Dominos], singlePort: true });
+const server = Server({ games: [Dominos, ConnectFour], singlePort: true });
 
 const port = Number(process.env.PORT || 8000);
 
