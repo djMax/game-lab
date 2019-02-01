@@ -14,6 +14,7 @@ import apiCall from '../common/apiCall';
 import sendMove from './ai';
 import OrganizeGame from './components/OrganizeGame';
 import DominoContainer from './DominoContainer';
+import Approval from './components/Approval';
 
 const styles = {
   root: {
@@ -96,6 +97,23 @@ class Dominos extends React.Component {
       }
       const other = multiplayer.state.others[id];
       return `${(other ? other.name : null) || id}'s Code`;
+    }
+  }
+
+  onApproval = async (approved) => {
+    const { multiplayer } = this.props;
+    const { players, gameID } = multiplayer.state.newGame;
+    if (approved) {
+      const playerID = String(players.indexOf(`human:${multiplayer.id}`));
+      const join = await apiCall(`/games/Dominos/${gameID}/join`, {
+        playerID,
+        playerName: multiplayer.state.name,
+      });
+      this.setState({ gameID, players, playerID, credentials: join.playerCredentials }, () => {
+        multiplayer.clearBroadcast();
+      });
+    } else {
+      multiplayer.clearBroadcast();
     }
   }
 
@@ -185,6 +203,10 @@ class Dominos extends React.Component {
     const { codeOpen, code, gameID, playerID, credentials } = this.state;
     const { classes, multiplayer } = this.props;
     const DominoClient = gameID ? this.getClient(gameID) : () => null;
+
+    if (!gameID && multiplayer.state.newGame) {
+      return <Approval multiplayer={multiplayer} onComplete={this.onApproval} />;
+    }
 
     return (
       <div className={classes.root}>

@@ -52,7 +52,6 @@ class Board extends React.Component {
 
   renderHand = (playerToRender) => {
     const { ctx: { phase, currentPlayer }, playerID, isActive, G: { names, board, players, pieces, lastPlay }, classes } = this.props;
-    const { piece } = this.state;
     const handProps = {};
     if (String(playerToRender) === String(playerID) && phase === 'play') {
       handProps.onClick = this.playPiece;

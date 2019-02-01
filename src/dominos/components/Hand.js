@@ -2,7 +2,6 @@ import React from 'react';
 import classnames from 'classnames';
 import { Button, withStyles } from '@material-ui/core';
 import Piece from './Piece';
-import LogicalHand from '../models/LogicalHand';
 
 const Hand = ({ classes, pieces, name, last, active, onClick, onPass, ...rest }) => {
   let finalHand = Array.isArray(pieces) ? pieces : Array(pieces).fill({ values: [undefined, undefined] });
