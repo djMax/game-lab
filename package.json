@@ -12,7 +12,6 @@
     "@material-ui/icons": "^3.0.1",
     "@material-ui/lab": "^3.0.0-alpha.29",
     "babel-preset-gasbuddy": "^5.3.0",
-    "blockly": "^1.0.0",
     "brace": "^0.11.1",
     "classnames": "^2.2.6",
     "koa-body": "^4.0.6",

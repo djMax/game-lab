@@ -1,7 +1,7 @@
 /* globals Blockly */
 import React from 'react';
 import AceEditor from 'react-ace';
-import Safe from 'react-safe';
+import Toolbox from './toolbox';
 
 import 'brace/mode/javascript';
 import 'brace/theme/monokai';
@@ -50,8 +50,24 @@ class CodeEditor extends React.Component {
 
     if (useBlocks && !window.blocklyWorkspace) {
       setTimeout(() => {
+        Blockly.ScratchMsgs.setLocale('en');
         window.blocklyWorkspace = Blockly.inject('blocklyDiv', {
-          toolbox: document.getElementById('toolbox'),
+          toolbox: document.getElementById('toolbox-categories'),
+          comments: true,
+          media: '/scratch/media/',
+          scrollbars: true,
+          zoom: {
+            controls: true,
+            wheel: true,
+            startScale: 0.75,
+            maxScale: 4,
+            minScale: 0.25,
+            scaleSpeed: 1.1
+          },
+          colours: {
+            fieldShadow: 'rgba(255, 255, 255, 0.3)',
+            dragShadowOpacity: 0.6
+          },
         });
       }, 250);
     }
@@ -85,11 +101,10 @@ class CodeEditor extends React.Component {
             }}
           />
         )}
-        {false && (
-          <div className={classes.button}>
-            <Button onClick={this.toggleMode}>Switch to {useBlocks ? 'Javascript Editor' : 'Block Editor'}</Button>
-          </div>
-        )}
+        <div className={classes.button}>
+          <Button onClick={this.toggleMode}>Switch to {useBlocks ? 'Javascript Editor' : 'Block Editor'}</Button>
+        </div>
+        <Toolbox />
       </div>
     );
   }
