@@ -2,6 +2,7 @@ import React from 'react';
 import logger from 'redux-logger';
 import { Client } from '@djmax/boardgame.io/react';
 import { applyMiddleware } from 'redux';
+import openSocket from 'socket.io-client';
 import apiCall from './apiCall';
 
 export class MultiplayerGame extends React.Component {
@@ -83,7 +84,7 @@ export class MultiplayerGame extends React.Component {
         players,
         names,
       },
-      numPlayers: 4,
+      numPlayers: this.numPlayers,
     });
     this.props.multiplayer.broadcast({
       type: 'NewGame',
@@ -135,7 +136,30 @@ export class MultiplayerGame extends React.Component {
           return next(action);
         }),
     };
+    console.error('GETCLIENT', clientArgs);
     this.clients[gameID] = Client(clientArgs);
     return this.clients[gameID];
+  }
+
+  sendMove(gameState, moveName, args) {
+    const { ctx: { currentPlayer }, _stateID } = gameState;
+    const { aiCredentials, gameID, speed = 1000 } = this.state;
+    const message = {
+      type: 'MAKE_MOVE',
+      payload: {
+        type: moveName,
+        args: args,
+        playerID: currentPlayer,
+        credentials: aiCredentials[currentPlayer],
+      }
+    };
+    const socket = openSocket(`/${this.name}`);
+    console.error('SENDING', message, _stateID);
+    socket.once('connect', () => {
+      setTimeout(() => {
+        socket.emit('update', message, _stateID || 0, `${this.name}:${gameID}`, currentPlayer);
+        socket.disconnect();
+      }, speed);
+    });
   }
 }

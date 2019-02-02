@@ -7,6 +7,7 @@ import { MultiplayerGame } from '../common/MultiplayerGame';
 import OrganizeGame from './OrganizeGame';
 import ConnectFourGameManager from './boardgame';
 import ConnectFourBoard from './Board';
+import LogicalBoard from './models/LogicalBoard';
 
 const styles = {
   root: {
@@ -31,8 +32,15 @@ class ConnectFour extends MultiplayerGame {
     code: window.localStorage.getItem('connect4.code') || sampleCode,
   }
 
-  headlineForState(gameState) {
-    return 'Start';
+  onGameChanged(action) {
+    const { currentPlayer } = action.state.ctx;
+    const { players } = action.state.G;
+    if (!players[currentPlayer].startsWith('human')) {
+      const b = new LogicalBoard(action.state.G);
+      const moves = b.availableMoves();
+      const spot = parseInt(Math.random() * moves.length, 10);
+      this.sendMove(action.state, 'place', [moves[spot]]);
+    }
   }
 
   render() {

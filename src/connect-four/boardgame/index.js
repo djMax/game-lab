@@ -1,8 +1,8 @@
 import { Game, TurnOrder, INVALID_MOVE } from '@djmax/boardgame.io/core';
 import LogicalBoard from '../models/LogicalBoard';
 
-function emptyBoard(cols, rows) {
-  return Array(cols).fill(0).map(x => [Array(rows).fill(-1)]);
+export function emptyBoard(cols, rows) {
+  return Array(cols).fill(0).map(x => Array(rows).fill(-1));
 }
 
 export default Game({
@@ -13,20 +13,26 @@ export default Game({
       scores: {
         p1: 0,
         p2: 0,
+        draw: 0,
       },
       names,
       players,
       playerTypes: players || ['human', 'random'],
-      columns: emptyBoard(7, 6),
     };
   },
 
   flow: {
+    startingPhase: 'play',
     movesPerTurn: 1,
+
     phases: {
-      default: {
+      play: {
         allowedMoves: ['place'],
         next: 'score',
+        onPhaseBegin(G, ctx) {
+          G.columns = emptyBoard(7, 6);
+          G.ack = 0;
+        },
         endPhaseIf(G, ctx) {
           return new LogicalBoard(G).didGameEnd();
         },
@@ -35,6 +41,17 @@ export default Game({
         allowedMoves: ['continue'],
         next: 'play',
         turnOrder: TurnOrder.ANY_ONCE,
+        onPhaseBegin(G, ctx) {
+          const winner = new LogicalBoard(G).winner();
+          G.lastWinner = winner;
+          if (winner === 0) {
+            G.scores.p1 += 1;
+          } else if (winner === 1) {
+            G.scores.p2 += 1;
+          } else {
+            G.scores.draw += 1;
+          }
+        },
         endPhaseIf(G) {
           return G.ack >= G.playerTypes.filter(p => p.startsWith('human')).length;
         },
@@ -47,7 +64,12 @@ export default Game({
       if (G.columns[column].length >= G.rows - 1) {
         return INVALID_MOVE;
       }
-      G.columns[column].push(ctx.currentPlayer);
+      const available = G.columns[column].lastIndexOf(-1);
+      if (available === -1) {
+        return INVALID_MOVE;
+      }
+      G.columns[column][available] = Number(ctx.currentPlayer);
+      G.lastMove = [column, available];
     },
     continue(G, ctx) {
       G.ack = (G.ack || 0) + 1;

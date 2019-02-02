@@ -1,4 +1,4 @@
-export const BoardStyle = {
+export const BoardStyle = theme => ({
   root: {
     display: 'flex',
     flexFlow: 'column nowrap',
@@ -9,6 +9,18 @@ export const BoardStyle = {
     width: 450,
     height: 450,
   },
+  hover: {
+    position: 'relative',
+    display: 'flex',
+    flexFlow: 'row nowrap',
+    alignItems: 'center',
+    top: 0,
+    left: 15,
+    zIndex: 1,
+    '&>div': {
+      transition: 'none',
+    },
+  },
   field: {
     position: 'absolute',
     top: 0,
@@ -18,14 +30,7 @@ export const BoardStyle = {
     width: 420,
     height: 435,
     overflow: 'hidden',
-    cursor: 'not-allowed',
-  },
-  grid: {
-    display: 'inline-flex',
-    flexFlow: 'column wrap',
-    position: 'relative',
-    minWidth: 420,
-    height: 360,
+    cursor: 'pointer',
   },
   column: {
     display: 'inline-flex',
@@ -51,20 +56,30 @@ export const BoardStyle = {
     color: '#fff',
     background: 'radial-gradient(circle, currentcolor 12px, #666 13px, currentcolor 14px, currentcolor 21px, #666 22px, transparent 23px, transparent) center/60px',
     opacity: 0,
-    pointerEvents: 'none',
     transition: 'opacity 0.2s, top 0s 0.2s, color 0s 0.2s',
   },
   red: {
     opacity: 1,
-    color: '#ff010b',
+    color: '#cc0105',
   },
   black: {
     opacity: 1,
     color: '#000000',
   },
   slot: {
-    width: 70,
-    height: 70,
-    border: '1px solid black',
+    width: 60,
+    height: 60,
   },
-};
+  message: {
+    textAlign: 'center',
+    margin: 10,
+    fontWeight: 900,
+  },
+  chips: {
+    textAlign: 'center',
+    marginTop: 20,
+    '&>div': {
+      margin: theme.spacing.unit,
+    },
+  },
+});
