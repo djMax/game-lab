@@ -17,12 +17,48 @@ function assemble(columns, start, inc) {
 }
 
 export default class LogicalBoard {
-  constructor({ columns }) {
+  constructor({ columns }, playerIsRed) {
     this.columns = columns;
+    this.isRed = playerIsRed;
   }
 
   didGameEnd() {
     return this.winner() !== null || this.availableMoves().length === 0;
+  }
+
+  boardWithMove(column, isRed) {
+    const newColumns = this.columns.slice(0);
+    newColumns[column] = newColumns[column].slice(0);
+    const available = newColumns[column].lastIndexOf(-1);
+    if (available === -1) {
+      return null;
+    }
+    newColumns[column][available] = isRed ? 0 : 1;
+    return new LogicalBoard({ columns: newColumns }, this.playerIsRed);
+  }
+
+  willIWin = (column) => {
+    const newBoard = this.boardWithMove(column);
+    if (!newBoard) {
+      return false;
+    }
+    const winner = newBoard.winner();
+    if ((winner === 0 && this.playerIsRed) || (winner === 1 && !this.playerIsRed)) {
+      return true;
+    }
+    return false;
+  }
+
+  willTheyWin = (column) => {
+    const newBoard = this.boardWithMove(column);
+    if (!newBoard) {
+      return false;
+    }
+    const winner = newBoard.winner();
+    if ((winner === 1 && this.playerIsRed) || (winner === 0 && !this.playerIsRed)) {
+      return true;
+    }
+    return false;
   }
 
   winner() {
@@ -52,7 +88,7 @@ export default class LogicalBoard {
     return null;
   }
 
-  availableMoves() {
+  availableMoves = () => {
     return this.columns.map((col, ix) => {
       if (col.indexOf(-1) === -1) {
         return false;

@@ -15,9 +15,24 @@ const styles = {
   },
 };
 
+function pickOne(array) {
+  if (Array.isArray(array)) {
+    return array[parseInt(Math.random() * array.length, 10)];
+  }
+  return null;
+}
+
 const sampleCode = `/*
  * This code decides how the computer moves. You need to return
  * which column to move into (0 is the first column)
+ *
+ * You are passed a "board" object that you can ask questions of:
+ *   board.willIWin(0) - returns true if you will win by moving to column 3
+ *   board.willTheyWin(3) - returns true if they will win by moving to column 3
+ *   board.availableMoves() - returns an array of available moves
+ *
+ * And some useful helpers:
+ *   pickOne(someArray) - pick a random value from an array
  */
 return 0;`;
 
@@ -28,19 +43,46 @@ class ConnectFour extends MultiplayerGame {
     'random': 'CPU (Random)',
   }
 
-  state = {
-    code: window.localStorage.getItem('connect4.code') || sampleCode,
-  }
+  state = this.defaultState()
 
   onGameChanged(action) {
     const { currentPlayer } = action.state.ctx;
     const { players } = action.state.G;
+    const { code } = this.state;
     if (!players[currentPlayer].startsWith('human')) {
-      const b = new LogicalBoard(action.state.G);
+      const b = new LogicalBoard(action.state.G, String(currentPlayer) === '0');
       const moves = b.availableMoves();
-      const spot = parseInt(Math.random() * moves.length, 10);
+      let spot = 0;
+      if (players[currentPlayer] === 'random') {
+        spot = moves[parseInt(Math.random() * moves.length, 10)];
+      } else if (players[currentPlayer] === 'defensive') {
+
+      } else if (players[currentPlayer] === 'code') {
+        spot = this.runUserCode(code, b);
+      }
       this.sendMove(action.state, 'place', [moves[spot]]);
     }
+  }
+
+  runUserCode(code, board) {
+    const transformed = window.Babel.transform(`retVal[0] = (function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
+    // eslint-disable-next-line no-new-func
+    const fn = new Function('board', 'pickOne', 'retVal', transformed);
+
+    try {
+      const retVal = [];
+      fn(board, pickOne, retVal);
+      console.log('User code returned', retVal[0]);
+      if (!board.availableMoves().includes(retVal[0])) {
+        console.error('User code return invalid move');
+      } else {
+        return retVal[0];
+      }
+    } catch (error) {
+      // TODO tell the user there was an error
+      console.error('User code failed', error);
+    }
+    return board.availableMoves()[0];
   }
 
   render() {
@@ -59,7 +101,7 @@ class ConnectFour extends MultiplayerGame {
           <Grid item xs>
             {gameID
               ?
-              <Connect4Client playerID={playerID} gameID={gameID} credentials={credentials} />
+              <Connect4Client playerID={playerID} gameID={gameID} credentials={credentials} onLeave={this.onLeave} />
               :
               <OrganizeGame ai={this.aiNames} onReady={this.startGame} defaultPlayers={['human', 'random']} />
             }

@@ -19,7 +19,13 @@ export class MultiplayerGame extends React.Component {
   clients = {}
 
   // Just in case you forget to define it...
-  state = {}
+  state = this.defaultState()
+
+  defaultState() {
+    return {
+      code: window.localStorage.getItem(`${this.name}.code`),
+    };
+  }
 
   onCodeChange = (code) => {
     this.setState({ code });
@@ -30,6 +36,10 @@ export class MultiplayerGame extends React.Component {
     const { multiplayer } = this.props;
     const { code } = this.state;
     multiplayer.newCode(this.name, code);
+  }
+
+  onLeave = () => {
+    this.setState({ gameID: null, credentials: null, playerID: null, players: null });
   }
 
   metadataToName = (spec) => {
@@ -136,7 +146,6 @@ export class MultiplayerGame extends React.Component {
           return next(action);
         }),
     };
-    console.error('GETCLIENT', clientArgs);
     this.clients[gameID] = Client(clientArgs);
     return this.clients[gameID];
   }

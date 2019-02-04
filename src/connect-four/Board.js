@@ -56,12 +56,12 @@ class Board extends React.Component {
         </span>
       );
     }
-    return 'Start';
+    return `${ctx.currentPlayer === '0' ? 'Red' : 'Black'}'s move`;
   }
 
   render() {
     const { hoverCol } = this.state;
-    const { G: { columns, scores }, moves, ctx: { currentPlayer }, classes } = this.props;
+    const { G: { columns, scores }, moves, ctx: { currentPlayer }, classes, onLeave } = this.props;
     return (
       <div className={classes.root}>
         <Typography variant="h5" color="primary" className={classes.message}>
@@ -111,6 +111,8 @@ class Board extends React.Component {
             avatar={<Avatar>{scores.draw}</Avatar>}
             label="Ties"
           />
+          <br/>
+          <Button variant="contained" onClick={onLeave}>Leave Game</Button>
         </div>
       </div>
     );
