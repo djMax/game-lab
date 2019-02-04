@@ -61,7 +61,7 @@ export default function sendMove({ action, speed, players, credentials, hand, ga
 
   const isFirstGame = scores.nw === 0 && scores.ew === 0;
   if (phase === 'score') {
-    message.payload = 'continue';
+    message.payload.type = 'continue';
   } else if (isFirstGame && !board.root) {
     // Double 6 required
     message.payload.args = { values: [6, 6] };
