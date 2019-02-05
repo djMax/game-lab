@@ -86,13 +86,14 @@ export class MultiplayerGame extends React.Component {
     }
   }
 
-  startGame = async (players) => {
+  startGame = async (players, options = {}) => {
     const names = players.map(this.metadataToName);
     const { gameID } = await apiCall(`/games/${this.name}/create`, {
       setupData: {
         master: this.props.multiplayer.id,
         players,
         names,
+        ...options,
       },
       numPlayers: this.numPlayers,
     });
@@ -102,6 +103,7 @@ export class MultiplayerGame extends React.Component {
       players,
       names,
       gameID,
+      ...options,
     });
     const joinUrl = `/games/${this.name}/${gameID}/join`;
     const playerID = String(players.indexOf(`human:${this.props.multiplayer.id}`));
@@ -163,12 +165,18 @@ export class MultiplayerGame extends React.Component {
       }
     };
     const socket = openSocket(`/${this.name}`);
-    console.error('SENDING', message, _stateID);
     socket.once('connect', () => {
       setTimeout(() => {
         socket.emit('update', message, _stateID || 0, `${this.name}:${gameID}`, currentPlayer);
         socket.disconnect();
       }, speed);
     });
+  }
+
+  static pickOne(array) {
+    if (Array.isArray(array)) {
+      return array[parseInt(Math.random() * array.length, 10)];
+    }
+    return null;
   }
 }

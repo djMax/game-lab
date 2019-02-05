@@ -14,7 +14,7 @@ import apiCall from '../common/apiCall';
 import sendMove from './ai';
 import OrganizeGame from './components/OrganizeGame';
 import DominoContainer from './DominoContainer';
-import Approval from './components/Approval';
+import Approval from '../common/Approval';
 
 const styles = {
   root: {

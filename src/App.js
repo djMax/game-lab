@@ -10,6 +10,7 @@ import Dominos from './dominos';
 import MultiplayerContainer from './common/MultiplayerContainer';
 import { Subscribe } from 'unstated';
 import ConnectFour from './connect-four';
+import Nim from './nim';
 
 const styles = {
   root: {
@@ -72,10 +73,11 @@ class App extends Component {
               open={Boolean(anchorEl)}
               onClose={this.handleClose}
             >
+              <MenuItem onClick={this.goFunction('/playground')}>Console Playground</MenuItem>
+              <MenuItem onClick={this.goFunction('/nim')}>Nim</MenuItem>
               <MenuItem onClick={this.goFunction('/tic-tac-toe')}>Tic-Tac-Toe</MenuItem>
               <MenuItem onClick={this.goFunction('/connect-four')}>Connect Four</MenuItem>
               <MenuItem onClick={this.goFunction('/dominos')}>Dominos</MenuItem>
-              <MenuItem onClick={this.goFunction('/playground')}>Console Playground</MenuItem>
             </Menu>
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Advent Game Lab
@@ -90,6 +92,7 @@ class App extends Component {
             <Route path="/playground" exact component={Playground} />
             <Route path="/dominos" exact component={Dominos} />
             <Route path="/connect-four" exact component={ConnectFour} />
+            <Route path="/nim" exact component={Nim} />
           </Switch>
         </div>
       </div>

@@ -5,9 +5,8 @@ import MultiplayerContainer from '../common/MultiplayerContainer';
 import Editor from '../editor';
 import { MultiplayerGame } from '../common/MultiplayerGame';
 import OrganizeGame from './OrganizeGame';
-import ConnectFourGameManager from './boardgame';
-import ConnectFourBoard from './Board';
-import LogicalBoard from './models/LogicalBoard';
+import NimGameManager from './boardgame';
+import NimBoard from './Board';
 import Approval from '../common/Approval';
 
 const styles = {
@@ -18,21 +17,22 @@ const styles = {
 
 const sampleCode = `/*
  * This code decides how the computer moves. You need to return
- * which column to move into (0 is the first column)
+ * which pile to choose from and how many to take, as an array,
+ * like this:
+ *   return [0, 3]; // That picks three balls from the first pile
  *
- * You are passed a "board" object that you can ask questions of:
- *   board.willIWin(0) - returns true if you will win by moving to column 3
- *   board.willTheyWin(3) - returns true if they will win by moving to column 3
- *   board.availableMoves() - returns an array of available moves
+ *  piles - an array with the current status of all the piles
+ *  piles.length - the number of piles
+ *  available(piles) - an array with pile numbers that have available balls
  *
  * And some useful helpers:
  *   pickOne(someArray) - pick a random value from an array
  */
-return pickOne(board.availableMoves());
+return [pickOne(availablePiles), 1];
 `;
 
-class ConnectFour extends MultiplayerGame {
-  name = 'ConnectFour'
+class Nim extends MultiplayerGame {
+  name = 'Nim'
 
   aiNames = {
     'random': 'CPU (Random)',
@@ -41,21 +41,21 @@ class ConnectFour extends MultiplayerGame {
   state = this.defaultState(sampleCode)
 
   onGameChanged(action) {
-    const { currentPlayer } = action.state.ctx;
+    const { currentPlayer, phase } = action.state.ctx;
     const { players } = action.state.G;
     const { code } = this.state;
+    if (phase === 'score') {
+      return;
+    }
     if (!players[currentPlayer].startsWith('human')) {
-      const b = new LogicalBoard(action.state.G, String(currentPlayer) === '0');
-      const moves = b.availableMoves();
-      let spot = 0;
+      let pile = 0;
+      let number = 1;
       if (players[currentPlayer] === 'random') {
-        spot = moves[parseInt(Math.random() * moves.length, 10)];
       } else if (players[currentPlayer] === 'defensive') {
-
       } else if (players[currentPlayer] === 'code') {
-        spot = this.runUserCode(code, b);
+        [pile, number] = this.runUserCode(code);
       }
-      this.sendMove(action.state, 'place', [moves[spot]]);
+      this.sendMove(action.state, 'pick', [pile, number]);
     }
   }
 
@@ -84,7 +84,7 @@ class ConnectFour extends MultiplayerGame {
     const { classes, multiplayer } = this.props;
     const { code, gameID, playerID, credentials } = this.state;
 
-    const Connect4Client = gameID ? this.getClient(gameID, ConnectFourGameManager, ConnectFourBoard) : () => null;
+    const NimClient = gameID ? this.getClient(gameID, NimGameManager, NimBoard) : () => null;
 
     if (!gameID && multiplayer.state.newGame && multiplayer.state.newGame.name === this.name) {
       return <Approval multiplayer={multiplayer} onComplete={this.onApproval} />;
@@ -96,7 +96,7 @@ class ConnectFour extends MultiplayerGame {
           <Grid item xs>
             {gameID
               ?
-              <Connect4Client playerID={playerID} gameID={gameID} credentials={credentials} onLeave={this.onLeave} />
+              <NimClient playerID={playerID} gameID={gameID} credentials={credentials} onLeave={this.onLeave} />
               :
               <OrganizeGame ai={this.aiNames} onReady={this.startGame} defaultPlayers={['human', 'random']} />
             }
@@ -116,6 +116,6 @@ class ConnectFour extends MultiplayerGame {
 
 export default withStyles(styles)(props => (
   <Subscribe to={[MultiplayerContainer]}>
-    {multiplayer => <ConnectFour {...props} multiplayer={multiplayer} />}
+    {multiplayer => <Nim {...props} multiplayer={multiplayer} />}
   </Subscribe>
 ))
