@@ -125,7 +125,7 @@ class CodeEditor extends React.Component {
             showPrintMargin={true}
             showGutter={true}
             highlightActiveLine={true}
-            value={code}
+            value={code || ''}
             width="100%"
             setOptions={{
               enableBasicAutoCompletion: false,

@@ -34,7 +34,8 @@ const sampleCode = `/*
  * And some useful helpers:
  *   pickOne(someArray) - pick a random value from an array
  */
-return 0;`;
+return pickOne(board.availableMoves());
+`;
 
 class ConnectFour extends MultiplayerGame {
   name = 'ConnectFour'
@@ -43,7 +44,7 @@ class ConnectFour extends MultiplayerGame {
     'random': 'CPU (Random)',
   }
 
-  state = this.defaultState({ code: sampleCode })
+  state = this.defaultState(sampleCode)
 
   onGameChanged(action) {
     const { currentPlayer } = action.state.ctx;
