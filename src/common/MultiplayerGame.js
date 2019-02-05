@@ -21,8 +21,9 @@ export class MultiplayerGame extends React.Component {
   // Just in case you forget to define it...
   state = this.defaultState()
 
-  defaultState() {
+  defaultState(defaults = {}) {
     return {
+      ...defaults,
       code: window.localStorage.getItem(`${this.name}.code`),
     };
   }

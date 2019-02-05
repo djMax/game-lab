@@ -28,4 +28,17 @@ tap.test('Board Win Checks', (t) => {
 
 tap.test('Board Will Win Checks', (t) => {
   let columns = emptyBoard(7, 6);
+
+  const board = new LogicalBoard({ columns }, true)
+    .boardWithMove(0, true)
+    .boardWithMove(0, true)
+    .boardWithMove(0, true);
+
+  t.ok(board.willIWin(0), 'Should win with 4th move');
+
+  board.isRed = false;
+  t.ok(!board.willIWin(0), 'Should not win with color flipped');
+  t.ok(board.willTheyWin(0), 'They Should win with color flipped');
+
+  t.end();
 });

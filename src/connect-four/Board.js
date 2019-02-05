@@ -61,7 +61,7 @@ class Board extends React.Component {
 
   render() {
     const { hoverCol } = this.state;
-    const { G: { columns, scores }, moves, ctx: { currentPlayer }, classes, onLeave } = this.props;
+    const { G: { columns, scores }, ctx: { currentPlayer }, classes, onLeave } = this.props;
     return (
       <div className={classes.root}>
         <Typography variant="h5" color="primary" className={classes.message}>

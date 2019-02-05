@@ -26,7 +26,7 @@ export default class LogicalBoard {
     return this.winner() !== null || this.availableMoves().length === 0;
   }
 
-  boardWithMove(column, isRed) {
+  boardWithMove = (column, isRed) => {
     const newColumns = this.columns.slice(0);
     newColumns[column] = newColumns[column].slice(0);
     const available = newColumns[column].lastIndexOf(-1);
@@ -34,28 +34,28 @@ export default class LogicalBoard {
       return null;
     }
     newColumns[column][available] = isRed ? 0 : 1;
-    return new LogicalBoard({ columns: newColumns }, this.playerIsRed);
+    return new LogicalBoard({ columns: newColumns }, this.isRed);
   }
 
   willIWin = (column) => {
-    const newBoard = this.boardWithMove(column);
+    const newBoard = this.boardWithMove(column, this.isRed);
     if (!newBoard) {
       return false;
     }
     const winner = newBoard.winner();
-    if ((winner === 0 && this.playerIsRed) || (winner === 1 && !this.playerIsRed)) {
+    if ((winner === 0 && this.isRed) || (winner === 1 && !this.isRed)) {
       return true;
     }
     return false;
   }
 
   willTheyWin = (column) => {
-    const newBoard = this.boardWithMove(column);
+    const newBoard = this.boardWithMove(column, !this.isRed);
     if (!newBoard) {
       return false;
     }
     const winner = newBoard.winner();
-    if ((winner === 1 && this.playerIsRed) || (winner === 0 && !this.playerIsRed)) {
+    if ((winner === 1 && this.isRed) || (winner === 0 && !this.isRed)) {
       return true;
     }
     return false;

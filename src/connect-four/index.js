@@ -43,7 +43,7 @@ class ConnectFour extends MultiplayerGame {
     'random': 'CPU (Random)',
   }
 
-  state = this.defaultState()
+  state = this.defaultState({ code: sampleCode })
 
   onGameChanged(action) {
     const { currentPlayer } = action.state.ctx;

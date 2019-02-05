@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, MenuItem, withStyles } from '@material-ui/core';
+import { Select, MenuItem } from '@material-ui/core';
 
 const PlayerMenu = ({ value, onChange, ai, gameName, playerIndex, classes, multiplayer }) => (
   <Select
