@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, withStyles, Typography, Card, CardContent, CardActions } from '@material-ui/core';
+import { Button, withStyles, Typography, Card, CardContent, CardActions, TextField } from '@material-ui/core';
 import { Subscribe } from 'unstated';
 import MultiplayerContainer from '../common/MultiplayerContainer';
 import PlayerMenu from '../common/PlayerMenu';
@@ -7,6 +7,8 @@ import PlayerMenu from '../common/PlayerMenu';
 class OrganizeGame extends React.Component {
   state = {
     players: this.props.defaultPlayers,
+    piles: '10',
+    maxPick: 3,
   }
 
   setPlayer = (multiplayer, index, value) => {
@@ -21,10 +23,13 @@ class OrganizeGame extends React.Component {
   }
 
   play = (multiplayer) => {
-    const { players } = this.state;
+    const { players, piles, maxPick } = this.state;
     const { onReady } = this.props;
     this.setState({ loading: true }, () => {
-      onReady(players.map(p => (p === 'human' ? `human:${multiplayer.id}` : p)));
+      onReady(players.map(p => (p === 'human' ? `human:${multiplayer.id}` : p)), {
+        piles: piles.split(','),
+        maxPick,
+      });
       this.setState({ loading: false });
     });
   }
@@ -41,8 +46,9 @@ class OrganizeGame extends React.Component {
             <Typography variant="h4">Start a New Game</Typography>
             <Typography component="p">
               Choose players for a game of Nim. You may choose to take any number
-              of balls from one of the piles. The player that takes the last ball
-              loses.
+              of balls from one of the piles. The player that
+              {' '}
+              <b>takes the last ball loses.</b>
             </Typography>
 
             <div className={classes.board}>
@@ -55,6 +61,28 @@ class OrganizeGame extends React.Component {
               <div className={classes.r}>
                 <PlayerMenu value={players[1]} ai={ai} classes={classes} onChange={this.setPlayer} gameName="Nim" playerIndex={1} multiplayer={multiplayer} />
               </div>
+            </div>
+            <div className={classes.details}>
+              <TextField
+                onChange={({ target: { value }}) => this.setState({ piles: value })}
+                autoFocus
+                margin="normal"
+                id="piles"
+                label="Initial piles and ball counts"
+                defaultValue={this.state.piles}
+                helperText="Comma-separated list of ball counts (example: 5,6,7)"
+                fullWidth
+              />
+              <TextField
+                onChange={({ target: { value }}) => this.setState({ maxPick: value })}
+                autoFocus
+                margin="normal"
+                id="piles"
+                label="Maximum Number of Balls Taken Per Turn"
+                defaultValue={this.state.maxPick}
+                helperText="Leave blank for no maximum"
+                fullWidth
+              />
             </div>
           </CardContent>
           <CardActions>
@@ -82,8 +110,7 @@ export default withStyles({
   },
   board: {
     position: 'relative',
-    width: 520,
-    height: 90,
+    top: 60,
   },
   menu: {
     minWidth: 150,
@@ -107,4 +134,7 @@ export default withStyles({
     bottom: '50%',
     right: 40,
   },
+  details: {
+    marginTop: 60,
+  }
 })(OrganizeGame);

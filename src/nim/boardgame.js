@@ -11,7 +11,7 @@ export default Game({
     players,
     names,
     piles = [10],
-    maxPick = 3
+    maxPick,
   }) {
     return {
       scores: {
@@ -21,7 +21,7 @@ export default Game({
       names,
       players,
       playerTypes: players || ['human', 'random'],
-      pileConfiguration: piles,
+      pileConfiguration: piles.map(p => Number(p)),
       maxPick,
     };
   },

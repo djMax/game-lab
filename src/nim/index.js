@@ -22,13 +22,14 @@ const sampleCode = `/*
  *   return [0, 3]; // That picks three balls from the first pile
  *
  *  piles - an array with the current status of all the piles
+ *  maxPick - the maximum number of balls you can take at once, or 0 if there is no maximum
  *  piles.length - the number of piles
- *  available(piles) - an array with pile numbers that have available balls
+ *  available - an array with pile numbers that have available balls
  *
  * And some useful helpers:
  *   pickOne(someArray) - pick a random value from an array
  */
-return [pickOne(availablePiles), 1];
+return [pickOne(available), 1];
 `;
 
 class Nim extends MultiplayerGame {
@@ -62,11 +63,21 @@ class Nim extends MultiplayerGame {
   runUserCode(code, board) {
     const transformed = window.Babel.transform(`retVal[0] = (function yourCode() { ${code} })()`, { presets: ['es2015'] }).code;
     // eslint-disable-next-line no-new-func
-    const fn = new Function('board', 'pickOne', 'retVal', transformed);
+    const fn = new Function('board', 'pickOne', 'random', 'piles', 'maxPick', 'available', 'retVal', transformed);
 
     try {
       const retVal = [];
-      fn(board, MultiplayerGame.pickOne, retVal);
+      fn(
+        board,
+        MultiplayerGame.pickOne,
+        MultiplayerGame.random,
+        board.piles.slice(0),
+        board.piles
+          .map((pile, ix) => (pile > 0 ? ix : null))
+          .filter(ix => ix !== null),
+        board.maxPick || 0,
+        retVal,
+      );
       console.log('User code returned', retVal[0]);
       if (!board.availableMoves().includes(retVal[0])) {
         console.error('User code return invalid move');

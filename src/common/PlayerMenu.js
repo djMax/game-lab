@@ -21,18 +21,18 @@ const PlayerMenu = ({ value, onChange, ai, gameName, playerIndex, classes, multi
       </MenuItem>
     )}
     {Object.entries(ai || {}).map(([id, name]) => (
-      <MenuItem value={id}>
+      <MenuItem value={id} key={`ai-${id}`}>
         <em>{name}</em>
       </MenuItem>
     ))}
     {multiplayer.state && Object.entries(multiplayer.state.others)
       .map(([id, { name }]) => (
-        <MenuItem key={id} value={`human:${id}`}>{name}</MenuItem>
+        <MenuItem key={`human-${id}`} value={`human:${id}`}>{name}</MenuItem>
       ))}
     {multiplayer.state && Object.entries(multiplayer.state.others)
       .filter(([id, s]) => s[gameName])
       .map(([id, s]) => (
-        <MenuItem key={id} value={`code:${id}:${s[gameName]}`}>{s.name}'s code</MenuItem>
+        <MenuItem key={`code-${id}`} value={`code:${id}:${s[gameName]}`}>{s.name}'s code</MenuItem>
       ))}
   </Select>
 );

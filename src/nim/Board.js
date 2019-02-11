@@ -68,9 +68,12 @@ class Board extends React.Component {
   }
 
   headlineForState() {
-    const { ctx } = this.props;
+    const { ctx, playerID } = this.props;
     if (ctx.phase === 'score') {
       return `Game Over. Player ${ctx.currentPlayer === '0' ? '1' : '2'} won!`;
+    }
+    if (ctx.currentPlayer === String(playerID)) {
+      return 'Your turn human.';
     }
     return `${ctx.currentPlayer === '0' ? 'Player 1' : 'Player 2'}'s move`;
   }
@@ -78,7 +81,7 @@ class Board extends React.Component {
   shouldHover(pileIx, ballIx) {
     const { hoverPile, hoverIndex } = this.state;
     const { G: { piles, maxPick } } = this.props;
-    if (hoverPile || hoverPile === 0) {
+    if (hoverPile === pileIx) {
       if (hoverIndex || hoverIndex === 0) {
         const count = ballIx - hoverIndex;
         return count >= 0

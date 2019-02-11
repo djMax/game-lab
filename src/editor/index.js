@@ -7,6 +7,7 @@ import Target from 'scratch-vm/src/engine/target';
 
 import 'brace/mode/javascript';
 import 'brace/theme/monokai';
+import 'brace/ext/language_tools';
 
 import { withStyles, Button } from '@material-ui/core';
 
@@ -128,8 +129,8 @@ class CodeEditor extends React.Component {
             value={code || ''}
             width="100%"
             setOptions={{
-              enableBasicAutoCompletion: false,
-              enableLiveAutoCompletion: true,
+              enableBasicAutocompletion: false,
+              enableLiveAutocompletion: true,
               enableSnippets: true,
               showLineNumbers: true,
               tabSize: 2,
