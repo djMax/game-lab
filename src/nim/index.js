@@ -80,19 +80,20 @@ class Nim extends MultiplayerGame {
 
     try {
       const retVal = [];
+      const allowed = board.piles
+        .map((pile, ix) => (pile > 0 ? ix : null))
+        .filter(ix => ix !== null);
       fn(
         board,
         MultiplayerGame.pickOne,
         MultiplayerGame.random,
         board.piles.slice(0),
-        board.piles
-          .map((pile, ix) => (pile > 0 ? ix : null))
-          .filter(ix => ix !== null),
+        allowed,
         board.maxPick || 0,
         retVal,
       );
       console.log('User code returned', retVal[0]);
-      if (!board.availableMoves().includes(retVal[0])) {
+      if (!allowed.includes(retVal[0])) {
         console.error('User code return invalid move');
       } else {
         return retVal[0];
