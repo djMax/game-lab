@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles, Grid } from '@material-ui/core';
+import { withStyles, Grid, Typography } from '@material-ui/core';
 import { Subscribe } from 'unstated';
 import MultiplayerContainer from '../common/MultiplayerContainer';
 import Editor from '../editor';
@@ -14,6 +14,10 @@ const styles = {
   root: {
     flexGrow: 1,
   },
+  reminder: {
+    marginTop: 30,
+    textAlign: 'center',
+  }
 };
 
 const sampleCode = `/*
@@ -49,12 +53,11 @@ class Nim extends MultiplayerGame {
     const { currentPlayer, phase } = action.state.ctx;
     const { players, piles, maxPick } = action.state.G;
     const { code } = this.state;
-    if (phase === 'score') {
-      return;
-    }
     if (!players[currentPlayer].startsWith('human')) {
-
-      let pile = 0;
+      if (phase === 'score') {
+        this.sendMove(action.state, 'continue', []);
+      }
+        let pile = 0;
       let number = 1;
       if (players[currentPlayer] === 'random') {
         const available = piles.map((pile, ix) => (pile > 0 ? ix : null))
@@ -62,7 +65,6 @@ class Nim extends MultiplayerGame {
         pile = MultiplayerGame.pickOne(available);
         const balls = MultiplayerGame.random(piles[pile]);
         number = Math.min(maxPick || balls, balls);
-      } else if (players[currentPlayer] === 'defensive') {
       } else if (players[currentPlayer] === 'code') {
         [pile, number] = this.runUserCode(code);
       }
@@ -121,6 +123,9 @@ class Nim extends MultiplayerGame {
                 <div>
                   <NimClient playerID={playerID} gameID={gameID} credentials={credentials} onLeave={this.onLeave} />
                   <AiSpeedSlider isMaster={gameMaster} speed={speed} setSpeed={v => this.setState({ speed: v })} />
+                  <Typography variant="h6" className={classes.reminder}>
+                    Remember, the one that takes the last ball loses.
+                  </Typography>
                 </div>
               )
               :

@@ -48,7 +48,7 @@ export default Game({
         next: 'play',
         turnOrder: TurnOrder.ANY_ONCE,
         onPhaseBegin(G, ctx) {
-          G.scores[ctx.currentPlayer] += 1;
+          G.scores[ctx.currentPlayer === '0' ? 'p1' : 'p2'] += 1;
         },
         endPhaseIf(G) {
           return G.ack >= G.playerTypes.filter(p => p.startsWith('human')).length;

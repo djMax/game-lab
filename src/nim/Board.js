@@ -73,9 +73,22 @@ class Board extends React.Component {
   }
 
   headlineForState() {
-    const { ctx, G: { lastPlay }, playerID } = this.props;
+    const { ctx, G: { lastPlay }, moves, playerID } = this.props;
     if (ctx.phase === 'score') {
-      return `Game Over. Player ${ctx.currentPlayer === '0' ? '1' : '2'} won!`;
+      if (ctx.currentPlayer === String(playerID)) {
+        return (
+          <span>
+            Game Over. You win!
+            <Button onClick={() => moves.continue()}>Next Game</Button>
+          </span>
+        );
+      }
+      return (
+        <span>
+          {`Game Over. Player ${ctx.currentPlayer === '0' ? '1' : '2'} won!`}
+          <Button onClick={() => moves.continue()}>Next Game</Button>
+        </span>
+      );
     }
     if (ctx.currentPlayer === String(playerID)) {
       if (lastPlay) {
@@ -111,8 +124,7 @@ class Board extends React.Component {
   }
 
   render() {
-    const { G: { piles, scores, master }, classes, onLeave } = this.props;
-    const { speed } = this.state;
+    const { G: { piles, scores }, classes, onLeave } = this.props;
     return (
       <div className={classes.root}>
         <Typography variant="h5" color="primary" className={classes.message}>
