@@ -15,6 +15,7 @@ import sendMove from './ai';
 import OrganizeGame from './components/OrganizeGame';
 import DominoContainer from './DominoContainer';
 import Approval from '../common/Approval';
+import SignIn from '../common/SignIn';
 
 const styles = {
   root: {
@@ -245,6 +246,6 @@ class Dominos extends React.Component {
 
 export default withStyles(styles)(props => (
   <Subscribe to={[MultiplayerContainer, DominoContainer]}>
-    {(multiplayer, dominoState) => <Dominos {...props} multiplayer={multiplayer} dominoState={dominoState} />}
+    {(multiplayer, dominoState) => multiplayer.state.name ? <Dominos {...props} multiplayer={multiplayer} dominoState={dominoState} /> : <SignIn />}
   </Subscribe>
 ));

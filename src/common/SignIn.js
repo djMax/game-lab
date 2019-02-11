@@ -16,7 +16,7 @@ export default class SignIn extends React.Component {
           <Dialog
             open
             aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Log In</DialogTitle>
+            <DialogTitle id="form-dialog-title">How Shall You Be Called?</DialogTitle>
                 <DialogContent>
                   <DialogContentText>
                     Please enter a nickname of your choosing. Do not impersonate someone else

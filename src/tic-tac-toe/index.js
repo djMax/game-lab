@@ -9,6 +9,7 @@ import GameFunctions from './game-functions';
 import PlayerTypeMenu from './PlayerTypeMenu';
 import { Subscribe } from 'unstated';
 import MultiplayerContainer from '../common/MultiplayerContainer';
+import SignIn from '../common/SignIn';
 
 const styles = theme => ({
   root: {
@@ -429,7 +430,7 @@ class TicTacToe extends React.Component {
   }
 
   render() {
-    return <Subscribe to={[MultiplayerContainer]}>{mp => this.renderWithMultiplayer(mp)}</Subscribe>;
+    return <Subscribe to={[MultiplayerContainer]}>{mp => mp.state.name ? this.renderWithMultiplayer(mp) : <SignIn />}</Subscribe>;
   }
 }
 TicTacToe.propTypes = {

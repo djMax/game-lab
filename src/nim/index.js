@@ -9,6 +9,7 @@ import NimGameManager from './boardgame';
 import NimBoard from './Board';
 import Approval from '../common/Approval';
 import AiSpeedSlider from '../common/AiSpeedSlider';
+import SignIn from '../common/SignIn';
 
 const styles = {
   root: {
@@ -147,6 +148,6 @@ class Nim extends MultiplayerGame {
 
 export default withStyles(styles)(props => (
   <Subscribe to={[MultiplayerContainer]}>
-    {multiplayer => <Nim {...props} multiplayer={multiplayer} />}
+    {multiplayer => multiplayer.state.name ? <Nim {...props} multiplayer={multiplayer} /> : <SignIn />}
   </Subscribe>
 ))

@@ -9,6 +9,7 @@ import ConnectFourGameManager from './boardgame';
 import ConnectFourBoard from './Board';
 import LogicalBoard from './models/LogicalBoard';
 import Approval from '../common/Approval';
+import SignIn from '../common/SignIn';
 
 const styles = {
   root: {
@@ -116,6 +117,6 @@ class ConnectFour extends MultiplayerGame {
 
 export default withStyles(styles)(props => (
   <Subscribe to={[MultiplayerContainer]}>
-    {multiplayer => <ConnectFour {...props} multiplayer={multiplayer} />}
+    {multiplayer => multiplayer.state.name ? <ConnectFour {...props} multiplayer={multiplayer} /> : <SignIn />}
   </Subscribe>
 ))

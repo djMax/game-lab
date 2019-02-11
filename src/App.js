@@ -7,8 +7,6 @@ import ProfileMenu from './ProfileMenu';
 import TicTacToe from './tic-tac-toe';
 import Playground from './playground';
 import Dominos from './dominos';
-import MultiplayerContainer from './common/MultiplayerContainer';
-import { Subscribe } from 'unstated';
 import ConnectFour from './connect-four';
 import Nim from './nim';
 import Intro from './Intro';
@@ -50,7 +48,7 @@ class App extends Component {
     return () => this.setState({ anchorEl: null }, () => history.push(url));
   }
 
-  renderContainer() {
+  render() {
     const { anchorEl, others } = this.state;
     const { classes } = this.props;
 
@@ -97,14 +95,6 @@ class App extends Component {
           </Switch>
         </div>
       </div>
-    );
-  }
-
-  render() {
-    return (
-      <Subscribe to={[MultiplayerContainer]}>
-      {multiplayer => (multiplayer.state.name ? this.renderContainer() : <SignIn />)}
-      </Subscribe>
     );
   }
 }

@@ -7,6 +7,7 @@ import Editor from '../editor';
 import Console from './Console';
 import { Subscribe } from 'unstated';
 import MultiplayerContainer from '../common/MultiplayerContainer';
+import SignIn from '../common/SignIn';
 
 const styles = theme => ({
   root: {
@@ -136,67 +137,67 @@ class Playground extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, multiplayer } = this.props;
     const { code, error, running, revert } = this.state;
 
+    if (!multiplayer.state.name) {
+      return <SignIn />;
+    }
+
     return (
-      <Subscribe to={[MultiplayerContainer]}>
-      {multiplayer => (
-        <div className={classes.root}>
-          <Grid container spacing={24}>
-            <Grid item xs>
-              {error && (
-                <Typography variant="body1" className={classes.message}>
-                  {error}
-                </Typography>
-              )}
-              <Console innerRef={this.consoleRef} onCtrl={this.accelerator} />
-            </Grid>
-            <Grid item xs>
-              <div className={classes.buttons}>
-                <Button variant="contained" color="primary" onClick={this.run} disabled={!!running}>
-                  <PlayArrow />
-                  Run Code
-                </Button>
-                <Button variant="contained" color="secondary" onClick={this.clear}>
-                  <ClearIcon />
-                  Clear Output
-                </Button>
-                {othersWithCode(multiplayer) && (
-                  <Select
-                    displayEmpty
-                    className={classes.formControl}
-                    onChange={this.copyFrom}
-                    value="-"
-                    inputProps={{
-                      id: 'copy-simple',
-                    }}
-                  >
-                    <MenuItem value="-" className={classes.invisible}>Copy code from...</MenuItem>
-                    {othersWithCode(multiplayer).map(([id, { name, playground }]) => (
-                      <MenuItem key={id} value={playground}>{name}</MenuItem>
-                    ))}
-                  </Select>
-                )}
-              </div>
-              <Editor
-                code={code}
-                onChange={this.onCodeChange}
-                onCommit={() => this.onCodeCommit(multiplayer)}
-              />
-              {revert && (
-                <Button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.setState({ revert: null, code: revert });
-                  }}
-                >Restore Previous Code</Button>
-              )}
-            </Grid>
+      <div className={classes.root}>
+        <Grid container spacing={24}>
+          <Grid item xs>
+            {error && (
+              <Typography variant="body1" className={classes.message}>
+                {error}
+              </Typography>
+            )}
+            <Console innerRef={this.consoleRef} onCtrl={this.accelerator} />
           </Grid>
-        </div>
-      )}
-      </Subscribe>
+          <Grid item xs>
+            <div className={classes.buttons}>
+              <Button variant="contained" color="primary" onClick={this.run} disabled={!!running}>
+                <PlayArrow />
+                Run Code
+              </Button>
+              <Button variant="contained" color="secondary" onClick={this.clear}>
+                <ClearIcon />
+                Clear Output
+              </Button>
+              {othersWithCode(multiplayer) && (
+                <Select
+                  displayEmpty
+                  className={classes.formControl}
+                  onChange={this.copyFrom}
+                  value="-"
+                  inputProps={{
+                    id: 'copy-simple',
+                  }}
+                >
+                  <MenuItem value="-" className={classes.invisible}>Copy code from...</MenuItem>
+                  {othersWithCode(multiplayer).map(([id, { name, playground }]) => (
+                    <MenuItem key={id} value={playground}>{name}</MenuItem>
+                  ))}
+                </Select>
+              )}
+            </div>
+            <Editor
+              code={code}
+              onChange={this.onCodeChange}
+              onCommit={() => this.onCodeCommit(multiplayer)}
+            />
+            {revert && (
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState({ revert: null, code: revert });
+                }}
+              >Restore Previous Code</Button>
+            )}
+          </Grid>
+        </Grid>
+      </div>
     );
   }
 
@@ -216,4 +217,8 @@ Playground.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Playground);
+export default withStyles(styles)(props => (
+  <Subscribe to={[MultiplayerContainer]}>
+    {multiplayer => <Playground {...props} multiplayer={multiplayer} />}
+  </Subscribe>
+));
