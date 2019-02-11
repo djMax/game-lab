@@ -67,7 +67,7 @@ class Nim extends MultiplayerGame {
         const balls = MultiplayerGame.random(piles[pile]);
         number = Math.min(maxPick || balls, balls);
       } else if (players[currentPlayer] === 'code') {
-        [pile, number] = this.runUserCode(code);
+        [pile, number] = this.runUserCode(code, action.state.G);
       }
       this.sendMove(action.state, 'pick', [pile, number]);
     }
@@ -78,11 +78,12 @@ class Nim extends MultiplayerGame {
     // eslint-disable-next-line no-new-func
     const fn = new Function('board', 'pickOne', 'random', 'piles', 'maxPick', 'available', 'retVal', transformed);
 
+    const allowed = board.piles
+      .map((pile, ix) => (pile > 0 ? ix : null))
+      .filter(ix => ix !== null);
+
     try {
       const retVal = [];
-      const allowed = board.piles
-        .map((pile, ix) => (pile > 0 ? ix : null))
-        .filter(ix => ix !== null);
       fn(
         board,
         MultiplayerGame.pickOne,
@@ -102,7 +103,7 @@ class Nim extends MultiplayerGame {
       // TODO tell the user there was an error
       console.error('User code failed', error);
     }
-    return board.availableMoves()[0];
+    return allowed[0];
   }
 
   render() {
