@@ -6,7 +6,9 @@ This is a "code battle" app built with [React](https://reactjs.org/), [babel/ES6
 for children, generally targeted for ages 8 and up, but adults shouldn't feel bad either.
 
 The goal is to program an AI that can play against other AIs or humans at a variety
-of simple games.
+of simple games. Multiplayer functionality is included so that you can play against other
+people currently using the site. There is currently no database storage so your code is simply stored
+in browser local storage and if the server goes down you lose any in-progress games.
 
 * [Nim](https://en.wikipedia.org/wiki/Nim) - There are a number of piles of balls. You can pick up to a maximum number of
 balls from a single pile, but you must pick at least one. The player forced to pick

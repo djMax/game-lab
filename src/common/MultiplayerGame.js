@@ -23,6 +23,7 @@ export class MultiplayerGame extends React.Component {
 
   defaultState(sampleCode) {
     return {
+      speed: 1500,
       code: window.localStorage.getItem(`${this.name}.code`) || sampleCode,
     };
   }
@@ -188,7 +189,8 @@ export class MultiplayerGame extends React.Component {
    * between 0 and max.length
    */
   static random(max) {
-    const maxRandom = Array.isArray(max) ? max.length : (max + 1);
-    return parseInt(Math.random() * maxRandom, 10);
+    const maxRandom = Array.isArray(max) ? max.length : max;
+    const bias = Array.isArray(max) ? 0 : 1;
+    return parseInt(Math.random() * maxRandom, 10) + bias;
   }
 }

@@ -55,6 +55,11 @@ const styles = theme => ({
       margin: theme.spacing.unit,
     },
   },
+  leave: {
+    '& button': {
+      margin: 30,
+    }
+  },
 });
 
 const emojis = ['⚽', '🏀', '🎾', '⚾', '🏐', '🎱'];
@@ -68,11 +73,14 @@ class Board extends React.Component {
   }
 
   headlineForState() {
-    const { ctx, playerID } = this.props;
+    const { ctx, G: { lastPlay }, playerID } = this.props;
     if (ctx.phase === 'score') {
       return `Game Over. Player ${ctx.currentPlayer === '0' ? '1' : '2'} won!`;
     }
     if (ctx.currentPlayer === String(playerID)) {
+      if (lastPlay) {
+        return `Player ${lastPlay[0]} took ${lastPlay[2]} balls from pile ${lastPlay[1]}. Your turn human.`;
+      }
       return 'Your turn human.';
     }
     return `${ctx.currentPlayer === '0' ? 'Player 1' : 'Player 2'}'s move`;
@@ -103,7 +111,8 @@ class Board extends React.Component {
   }
 
   render() {
-    const { G: { piles, scores }, ctx: { currentPlayer }, classes, onLeave } = this.props;
+    const { G: { piles, scores, master }, classes, onLeave } = this.props;
+    const { speed } = this.state;
     return (
       <div className={classes.root}>
         <Typography variant="h5" color="primary" className={classes.message}>
@@ -143,8 +152,9 @@ class Board extends React.Component {
             avatar={<Avatar>{scores.p2}</Avatar>}
             label="Player 2"
           />
-          <br/>
-          <Button variant="contained" onClick={onLeave}>Leave Game</Button>
+          <div className={classes.leave}>
+            <Button variant="contained" onClick={onLeave}>Leave Game</Button>
+          </div>
         </div>
       </div>
     );

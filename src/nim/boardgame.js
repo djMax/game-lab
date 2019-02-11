@@ -12,6 +12,7 @@ export default Game({
     names,
     piles = [10],
     maxPick,
+    master,
   }) {
     return {
       scores: {
@@ -19,6 +20,7 @@ export default Game({
         p2: 0,
       },
       names,
+      master,
       players,
       playerTypes: players || ['human', 'random'],
       pileConfiguration: piles.map(p => Number(p)),
@@ -38,14 +40,16 @@ export default Game({
           G.piles = G.pileConfiguration.slice(0);
         },
         endPhaseIf(G, ctx) {
-          return G.piles.reduce((prev, cur) => prev + cur, 0) === 1;
+          return G.piles.reduce((prev, cur) => prev + cur, 0) <= 1;
         },
       },
       score: {
         allowedMoves: ['continue'],
         next: 'play',
         turnOrder: TurnOrder.ANY_ONCE,
-        onPhaseBegin(G, ctx) {},
+        onPhaseBegin(G, ctx) {
+          G.scores[ctx.currentPlayer] += 1;
+        },
         endPhaseIf(G) {
           return G.ack >= G.playerTypes.filter(p => p.startsWith('human')).length;
         },
@@ -59,11 +63,13 @@ export default Game({
         return INVALID_MOVE;
       }
       if (number > G.maxPick && G.maxPick) {
-        return INVALID_MOVE;
+        // Be nice to the kids.
+        number = G.maxPick;
       }
       const newPiles = G.piles.slice(0);
       newPiles[pile] -= number;
       G.piles = newPiles;
+      G.lastPlay = [ctx.currentPlayer, pile, number];
     },
     continue (G, ctx) {
       G.ack = (G.ack || 0) + 1;

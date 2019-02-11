@@ -8,6 +8,7 @@ import OrganizeGame from './OrganizeGame';
 import NimGameManager from './boardgame';
 import NimBoard from './Board';
 import Approval from '../common/Approval';
+import AiSpeedSlider from '../common/AiSpeedSlider';
 
 const styles = {
   root: {
@@ -28,8 +29,11 @@ const sampleCode = `/*
  *
  * And some useful helpers:
  *   pickOne(someArray) - pick a random value from an array
+ *   random(n) - pick a random number between 1 and n (up to and including n)
  */
-return [pickOne(available), 1];
+const pile = pickOne(available);
+const balls = random(piles[pile]);
+return [pile, balls];
 `;
 
 class Nim extends MultiplayerGame {
@@ -43,15 +47,21 @@ class Nim extends MultiplayerGame {
 
   onGameChanged(action) {
     const { currentPlayer, phase } = action.state.ctx;
-    const { players } = action.state.G;
+    const { players, piles, maxPick } = action.state.G;
     const { code } = this.state;
     if (phase === 'score') {
       return;
     }
     if (!players[currentPlayer].startsWith('human')) {
+
       let pile = 0;
       let number = 1;
       if (players[currentPlayer] === 'random') {
+        const available = piles.map((pile, ix) => (pile > 0 ? ix : null))
+        .filter(ix => ix !== null);
+        pile = MultiplayerGame.pickOne(available);
+        const balls = MultiplayerGame.random(piles[pile]);
+        number = Math.min(maxPick || balls, balls);
       } else if (players[currentPlayer] === 'defensive') {
       } else if (players[currentPlayer] === 'code') {
         [pile, number] = this.runUserCode(code);
@@ -93,7 +103,7 @@ class Nim extends MultiplayerGame {
 
   render() {
     const { classes, multiplayer } = this.props;
-    const { code, gameID, playerID, credentials } = this.state;
+    const { code, gameID, playerID, credentials, speed, gameMaster } = this.state;
 
     const NimClient = gameID ? this.getClient(gameID, NimGameManager, NimBoard) : () => null;
 
@@ -107,7 +117,12 @@ class Nim extends MultiplayerGame {
           <Grid item xs>
             {gameID
               ?
-              <NimClient playerID={playerID} gameID={gameID} credentials={credentials} onLeave={this.onLeave} />
+              (
+                <div>
+                  <NimClient playerID={playerID} gameID={gameID} credentials={credentials} onLeave={this.onLeave} />
+                  <AiSpeedSlider isMaster={gameMaster} speed={speed} setSpeed={v => this.setState({ speed: v })} />
+                </div>
+              )
               :
               <OrganizeGame ai={this.aiNames} onReady={this.startGame} defaultPlayers={['human', 'random']} />
             }

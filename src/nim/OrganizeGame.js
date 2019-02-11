@@ -15,7 +15,7 @@ class OrganizeGame extends React.Component {
     const players = this.state.players.slice(0);
     const exPlayer = players[index];
     const existingIndex = players.findIndex(p => p === value);
-    if (existingIndex >= 0) {
+    if (existingIndex >= 0 && value.startsWith('human')) {
       players[existingIndex] = exPlayer;
     }
     players[index] = value;
