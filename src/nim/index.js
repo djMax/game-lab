@@ -67,12 +67,7 @@ class Nim extends MultiplayerGame {
         const balls = MultiplayerGame.random(piles[pile]);
         number = Math.min(maxPick || balls, balls);
       } else if (players[currentPlayer] === 'code') {
-        const rawVal = this.runUserCode(code, action.state.G);
-        if (Array.isArray(rawVal)) {
-          [pile, number] = rawVal;
-        } else {
-          number = rawVal;
-        }
+        [pile, number] = this.runUserCode(code, action.state.G);
       }
       this.sendMove(action.state, 'pick', [pile, number]);
     }
@@ -99,10 +94,14 @@ class Nim extends MultiplayerGame {
         retVal,
       );
       console.log('User code returned', retVal[0]);
-      if (!allowed.includes(retVal[0])) {
+      if (!Array.isArray(retVal[0])) {
+        retVal[0] = [0, retVal[0]];
+      }
+      const [pile, number] = retVal[0];
+      if (!allowed.includes(pile)) {
         console.error('User code return invalid move');
       } else {
-        return retVal[0];
+        return [pile, number];
       }
     } catch (error) {
       // TODO tell the user there was an error
