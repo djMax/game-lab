@@ -34,7 +34,7 @@ Future Enhancement
 
 Currently, I'm working on getting [scratch-blocks](https://github.com/LLK/scratch-blocks)+[scratch-vm](https://github.com/LLK/scratch-vm)
 as an option in the code editor, and a step debugger on the JS side.
-Neither are easy, and I'd love help or pointers.
+Neither are easy, and I'd love [help or pointers](https://github.com/djmax/game-lab/issues).
 
 Development
 ===========
