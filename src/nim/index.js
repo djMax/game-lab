@@ -58,7 +58,7 @@ class Nim extends MultiplayerGame {
       if (phase === 'score') {
         this.sendMove(action.state, 'continue', []);
       }
-        let pile = 0;
+      let pile = 0;
       let number = 1;
       if (players[currentPlayer] === 'random') {
         const available = piles.map((pile, ix) => (pile > 0 ? ix : null))
@@ -67,7 +67,12 @@ class Nim extends MultiplayerGame {
         const balls = MultiplayerGame.random(piles[pile]);
         number = Math.min(maxPick || balls, balls);
       } else if (players[currentPlayer] === 'code') {
-        [pile, number] = this.runUserCode(code, action.state.G);
+        const rawVal = this.runUserCode(code, action.state.G);
+        if (Array.isArray(rawVal)) {
+          [pile, number] = rawVal;
+        } else {
+          number = rawVal;
+        }
       }
       this.sendMove(action.state, 'pick', [pile, number]);
     }
