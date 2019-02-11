@@ -29,6 +29,13 @@ You can try them all at the [Advent Game Lab Demo Site](https://advent-game-lab.
 
 This site was built with love for an after school program at the [Advent School](https://adventschool.org). Please [consider a donation](https://adventschool.org/support/) if you would like to support work like this.
 
+Future Enhancement
+------------------
+
+Currently, I'm working on getting [scratch-blocks](https://github.com/LLK/scratch-blocks)+[scratch-vm](https://github.com/LLK/scratch-vm)
+as an option in the code editor, and a step debugger on the JS side.
+Neither are easy, and I'd love help or pointers.
+
 Development
 ===========
 

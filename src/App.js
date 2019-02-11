@@ -11,6 +11,7 @@ import MultiplayerContainer from './common/MultiplayerContainer';
 import { Subscribe } from 'unstated';
 import ConnectFour from './connect-four';
 import Nim from './nim';
+import Intro from './Intro';
 
 const styles = {
   root: {
@@ -87,7 +88,7 @@ class App extends Component {
         </AppBar>
         <div className={classes.app}>
           <Switch>
-            <Route path="/" exact component={TicTacToe} />
+            <Route path="/" exact component={Intro} />
             <Route path="/tic-tac-toe" exact component={TicTacToe} others={others} />
             <Route path="/playground" exact component={Playground} />
             <Route path="/dominos" exact component={Dominos} />
