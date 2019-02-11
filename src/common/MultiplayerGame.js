@@ -173,10 +173,22 @@ export class MultiplayerGame extends React.Component {
     });
   }
 
+  /**
+   * Pick a random element of an array
+   */
   static pickOne(array) {
     if (Array.isArray(array)) {
       return array[parseInt(Math.random() * array.length, 10)];
     }
     return null;
+  }
+
+  /**
+   * Pick a number between 1 and max, or if max is an array,
+   * between 0 and max.length
+   */
+  static random(max) {
+    const maxRandom = Array.isArray(max) ? max.length : (max + 1);
+    return parseInt(Math.random() * maxRandom, 10);
   }
 }
