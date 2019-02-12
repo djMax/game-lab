@@ -98,7 +98,7 @@ class Nim extends MultiplayerGame {
         retVal[0] = [0, retVal[0]];
       }
       const [pile, number] = retVal[0];
-      if (!allowed.includes(pile)) {
+      if (!allowed.includes(pile) || number <= 0) {
         console.error('User code return invalid move');
       } else {
         return [pile, number];
