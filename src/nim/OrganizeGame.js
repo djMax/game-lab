@@ -104,7 +104,7 @@ class OrganizeGame extends React.Component {
 export default withStyles({
   root: {
     position: 'absolute',
-    top: 200,
+    top: 130,
     left: 80,
     maxWidth: 520,
   },

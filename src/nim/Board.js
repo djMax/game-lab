@@ -60,6 +60,10 @@ const styles = theme => ({
       margin: 30,
     }
   },
+  pileNumber: {
+    fontSize: '28px !important',
+    color: 'gray',
+  },
 });
 
 const emojis = ['⚽', '🏀', '🎾', '⚾', '🏐', '🎱'];
@@ -92,7 +96,7 @@ class Board extends React.Component {
     }
     if (ctx.currentPlayer === String(playerID)) {
       if (lastPlay) {
-        return `Player ${Number(lastPlay[0]) + 1} took ${lastPlay[2]} balls from pile ${lastPlay[1]}. Your turn human.`;
+        return `Player ${Number(lastPlay[0]) + 1} took ${lastPlay[2]} ball${lastPlay[2] > 1 ? 's' : ''} from pile ${lastPlay[1]}. Your turn human.`;
       }
       return 'Your turn human.';
     }
@@ -150,6 +154,7 @@ class Board extends React.Component {
                     {emojis[ix % emojis.length]}
                   </div>
                 ))}
+                <div className={classes.pileNumber}>{` (${p})`}</div>
                 </td></tr>
               ))}
             </tbody>
@@ -157,12 +162,22 @@ class Board extends React.Component {
         </div>
         <div className={classes.chips}>
           <Chip
-            avatar={<Avatar>{scores.p1}</Avatar>}
-            label="Player 1"
+            avatar={<Avatar>{scores.p1Start.p1}</Avatar>}
+            label="Player 1 Start/Win"
           />
           <Chip
-            avatar={<Avatar>{scores.p2}</Avatar>}
-            label="Player 2"
+            avatar={<Avatar>{scores.p2Start.p2}</Avatar>}
+            label="Player 2 Start/Win"
+          />
+        </div>
+        <div className={classes.chips}>
+          <Chip
+            avatar={<Avatar>{scores.p2Start.p1}</Avatar>}
+            label="Player 1 2nd/Win"
+          />
+          <Chip
+            avatar={<Avatar>{scores.p1Start.p2}</Avatar>}
+            label="Player 2 2nd/Win"
           />
           <div className={classes.leave}>
             <Button variant="contained" onClick={onLeave}>Leave Game</Button>

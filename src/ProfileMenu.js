@@ -4,7 +4,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { Subscribe } from 'unstated';
 import MultiplayerContainer from './common/MultiplayerContainer';
 
-export default class ProfileMenu extends React.Component {
+class ProfileMenuImpl extends React.Component {
   state = {
     anchorEl: null,
   }
@@ -20,42 +20,52 @@ export default class ProfileMenu extends React.Component {
 
   render() {
     const { anchorEl } = this.state;
+    const { multiplayer } = this.props;
     const open = Boolean(anchorEl);
+
+    if (!multiplayer.state.name) {
+      return null;
+    }
+
     return (
-      <Subscribe to={[MultiplayerContainer]}>
-      {multiplayer => (
-        <div>
-          <IconButton
-            aria-owns={open ? 'menu-appbar' : undefined}
-            aria-haspopup="true"
-            onClick={this.handleMenu}
-            color="inherit"
-          >
-            <AccountCircle />
-            &nbsp;
-            <Typography color="inherit">
-              {window.localStorage.getItem('player.name')}
-            </Typography>
-          </IconButton>
-          <Menu
-            id="menu-appbar"
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={open}
-            onClose={this.handleClose}
-          >
-            <MenuItem onClick={multiplayer.signOut}>Change Nickname</MenuItem>
-          </Menu>
-        </div>
-      )}
-      </Subscribe>
+      <div>
+        <IconButton
+          aria-owns={open ? 'menu-appbar' : undefined}
+          aria-haspopup="true"
+          onClick={this.handleMenu}
+          color="inherit"
+        >
+          <AccountCircle />
+          &nbsp;
+          <Typography color="inherit">
+            {window.localStorage.getItem('player.name')}
+          </Typography>
+        </IconButton>
+        <Menu
+          id="menu-appbar"
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          open={open}
+          onClose={this.handleClose}
+        >
+          <MenuItem onClick={multiplayer.signOut}>Change Nickname</MenuItem>
+        </Menu>
+      </div>
     );
   }
+}
+
+export default function ProfileMenu(props) {
+  return (
+    <Subscribe to={[MultiplayerContainer]}>
+      {multiplayer => <ProfileMenuImpl {...props} multiplayer={multiplayer} />}
+    </Subscribe>
+  )
 }

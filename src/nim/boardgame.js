@@ -16,15 +16,17 @@ export default Game({
   }) {
     return {
       scores: {
-        p1: 0,
-        p2: 0,
+        p1Start: { p1: 0, p2: 0 },
+        p2Start: { p1: 0, p2: 0 },
       },
+      scoreSlot: 'p1Start',
       names,
       master,
       players,
-      playerTypes: players || ['human', 'random'],
+      playerTypes: players || ['human', 'code'],
       pileConfiguration: piles.map(p => Number(p)),
       maxPick,
+      turns: [],
     };
   },
 
@@ -36,9 +38,21 @@ export default Game({
       play: {
         allowedMoves: ['pick'],
         next: 'score',
+        turnOrder: {
+          first(G, ctx) {
+            return G.scoreSlot === 'p1Start' ? '0' : '1';
+          },
+          next(G, ctx) {
+            // Some sort of bug causes next to get called
+            // before a turn starts.
+            if (G.turns.length === 0) {
+              return G.scoreSlot === 'p1Start' ? '0' : '1';
+            }
+            return ctx.currentPlayer === '1' ? '0' : '1';
+          },
+        },
         onPhaseBegin(G, ctx) {
           G.piles = G.pileConfiguration.slice(0);
-          G.ack = 0;
         },
         endPhaseIf(G, ctx) {
           return G.piles.reduce((prev, cur) => prev + cur, 0) <= 1;
@@ -49,10 +63,15 @@ export default Game({
         next: 'play',
         turnOrder: TurnOrder.ANY_ONCE,
         onPhaseBegin(G, ctx) {
-          G.scores[ctx.currentPlayer === '0' ? 'p1' : 'p2'] += 1;
+          G.scores[G.scoreSlot][ctx.currentPlayer === '0' ? 'p1' : 'p2'] += 1;
+          G.scoreSlot = G.scoreSlot === 'p1Start' ? 'p2Start' : 'p1Start';
+        },
+        onPhaseEnd(G, ctx) {
+          G.ack = 0;
+          G.turns = [];
         },
         endPhaseIf(G) {
-          return G.ack >= G.playerTypes.filter(p => p.startsWith('human')).length;
+          return G.ack >= Math.max(G.playerTypes.filter(p => p.startsWith('human')).length, 1);
         },
       },
     },
@@ -70,7 +89,8 @@ export default Game({
       const newPiles = G.piles.slice(0);
       newPiles[pile] -= number;
       G.piles = newPiles;
-      G.lastPlay = [ctx.currentPlayer, pile, number];
+      const turnSummary = [ctx.currentPlayer, pile, number];
+      G.turns.push(turnSummary);
     },
     continue (G, ctx) {
       G.ack = (G.ack || 0) + 1;

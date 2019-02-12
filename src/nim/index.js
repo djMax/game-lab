@@ -57,6 +57,7 @@ class Nim extends MultiplayerGame {
     if (!players[currentPlayer].startsWith('human')) {
       if (phase === 'score') {
         this.sendMove(action.state, 'continue', []);
+        return;
       }
       let pile = 0;
       let number = 1;
@@ -136,7 +137,7 @@ class Nim extends MultiplayerGame {
                 </div>
               )
               :
-              <OrganizeGame ai={this.aiNames} onReady={this.startGame} defaultPlayers={['human', 'random']} />
+              <OrganizeGame ai={this.aiNames} onReady={this.startGame} defaultPlayers={['human', 'code']} />
             }
           </Grid>
           <Grid item xs>

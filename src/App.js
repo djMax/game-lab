@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, withStyles, IconButton, Menu, MenuItem } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import SignIn from './common/SignIn';
 import ProfileMenu from './ProfileMenu';
 import TicTacToe from './tic-tac-toe';
 import Playground from './playground';
