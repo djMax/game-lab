@@ -92,7 +92,7 @@ class Board extends React.Component {
     }
     if (ctx.currentPlayer === String(playerID)) {
       if (lastPlay) {
-        return `Player ${lastPlay[0] + 1} took ${lastPlay[2]} balls from pile ${lastPlay[1]}. Your turn human.`;
+        return `Player ${Number(lastPlay[0]) + 1} took ${lastPlay[2]} balls from pile ${lastPlay[1]}. Your turn human.`;
       }
       return 'Your turn human.';
     }

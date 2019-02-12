@@ -38,6 +38,7 @@ export default Game({
         next: 'score',
         onPhaseBegin(G, ctx) {
           G.piles = G.pileConfiguration.slice(0);
+          G.ack = 0;
         },
         endPhaseIf(G, ctx) {
           return G.piles.reduce((prev, cur) => prev + cur, 0) <= 1;
