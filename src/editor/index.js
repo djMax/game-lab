@@ -50,7 +50,7 @@ class CodeEditor extends React.Component {
   }
 
   render() {
-    const { classes, code, offerBlocks } = this.props;
+    const { classes, code, offerBlocks, markers } = this.props;
     const { useBlocks } = this.state;
 
     if (useBlocks && !window.blocklyWorkspace) {
@@ -116,6 +116,7 @@ class CodeEditor extends React.Component {
         )}
         {!useBlocks && (
           <AceEditor
+            markers={markers}
             mode="javascript"
             theme="monokai"
             name="codeEditor"

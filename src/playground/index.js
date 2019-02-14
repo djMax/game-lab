@@ -8,6 +8,8 @@ import Console from './Console';
 import { Subscribe } from 'unstated';
 import MultiplayerContainer from '../common/MultiplayerContainer';
 import SignIn from '../common/SignIn';
+import Interpreter from '../common/interpreter/interpreter';
+import CodeManager from '../common/interpreter/CodeManager';
 
 const styles = theme => ({
   root: {
@@ -46,6 +48,9 @@ const styles = theme => ({
   },
   invisible: {
     display: 'none',
+  },
+  running: {
+    backgroundColor: '#44535a',
   },
 });
 
@@ -102,6 +107,22 @@ class Playground extends React.Component {
     this.setState({ code: value, revert: code });
   }
 
+  step = () => {
+    const shouldContinue = this.activeCode.step();
+    if (!shouldContinue) {
+      this.consoleRef.current.addLine(['', '⏹ Your program has completed.']);
+    } else {
+      console.error(this.activeCode.sourcePosition);
+      this.setState({
+        markers: [{
+          ...this.activeCode.sourcePosition,
+          type: 'text',
+          className: this.props.classes.running,
+        }],
+      });
+    }
+  }
+
   run = (e) => {
     e && e.preventDefault();
     const { code, running } = this.state;
@@ -111,20 +132,16 @@ class Playground extends React.Component {
     this.setState({ running: true }, async () => {
       await this.consoleRef.current.clear();
       try {
-        const retVal = [];
-        let fn = this.cachedFn;
-        if (code !== this.cachedSource || !fn) {
-          const transformed = window.Babel.transform(`retVal[0] = (async function yourCode() { ${code} return main(); })()`, { presets: ['es2015'] }).code;
-          // eslint-disable-next-line no-new-func
-          fn = new Function(...this.exposedProperties, 'retVal', transformed);
-          this.cachedFn = fn;
+        if (code !== this.cachedSource) {
+          const cm = new CodeManager(code);
+          cm.transform();
           this.cachedSource = code;
+          this.activeCode = cm;
+          cm.start({ print: this.print });
         }
-        fn(...this.exposedProperties.map(f => this[f]), retVal);
-        await retVal[0];
-        this.consoleRef.current.addLine(['', '⏹ Your program has completed.']);
-        this.setState({ running: false });
+        this.setState({ running: true });
       } catch (error) {
+        console.error('Code failure', error);
         this.setState({ running: false, error });
         return error.message;
       }
@@ -138,7 +155,7 @@ class Playground extends React.Component {
 
   render() {
     const { classes, multiplayer } = this.props;
-    const { code, error, running, revert } = this.state;
+    const { code, error, running, revert, markers } = this.state;
 
     if (!multiplayer.state.name) {
       return <SignIn />;
@@ -149,8 +166,8 @@ class Playground extends React.Component {
         <Grid container spacing={24}>
           <Grid item xs>
             {error && (
-              <Typography variant="body1" className={classes.message}>
-                {error}
+              <Typography variant="body1" className={classes.message} component="pre">
+                {JSON.stringify(error, null, '\t')}
               </Typography>
             )}
             <Console innerRef={this.consoleRef} onCtrl={this.accelerator} />
@@ -161,6 +178,7 @@ class Playground extends React.Component {
                 <PlayArrow />
                 Run Code
               </Button>
+              <Button onClick={this.step}>Step</Button>
               <Button variant="contained" color="secondary" onClick={this.clear}>
                 <ClearIcon />
                 Clear Output
@@ -183,6 +201,7 @@ class Playground extends React.Component {
               )}
             </div>
             <Editor
+              markers={markers}
               code={code}
               onChange={this.onCodeChange}
               onCommit={() => this.onCodeCommit(multiplayer)}
