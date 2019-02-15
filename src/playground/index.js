@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import { Typography, withStyles, Grid, Button, Select, MenuItem } from '@material-ui/core';
 import PlayArrow from '@material-ui/icons/PlayArrow';
 import ClearIcon from '@material-ui/icons/Clear';
-import Editor from '../editor';
+import Editor from '../common/ide';
 import Console from './Console';
 import { Subscribe } from 'unstated';
 import MultiplayerContainer from '../common/MultiplayerContainer';
 import SignIn from '../common/SignIn';
-import Interpreter from '../common/interpreter/interpreter';
 import CodeManager from '../common/interpreter/CodeManager';
 
 const styles = theme => ({
@@ -107,15 +106,15 @@ class Playground extends React.Component {
     this.setState({ code: value, revert: code });
   }
 
-  step = () => {
+  step = async () => {
     const shouldContinue = this.activeCode.step();
     if (!shouldContinue) {
       this.consoleRef.current.addLine(['', '⏹ Your program has completed.']);
     } else {
-      console.error(this.activeCode.sourcePosition);
+      const sourcePosition = await this.activeCode.sourcePosition();
       this.setState({
         markers: [{
-          ...this.activeCode.sourcePosition,
+          ...sourcePosition,
           type: 'text',
           className: this.props.classes.running,
         }],

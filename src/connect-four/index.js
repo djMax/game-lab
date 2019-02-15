@@ -2,7 +2,7 @@ import React from 'react';
 import { withStyles, Grid } from '@material-ui/core';
 import { Subscribe } from 'unstated';
 import MultiplayerContainer from '../common/MultiplayerContainer';
-import Editor from '../editor';
+import Editor from '../common/editor';
 import { MultiplayerGame } from '../common/MultiplayerGame';
 import OrganizeGame from './OrganizeGame';
 import ConnectFourGameManager from './boardgame';

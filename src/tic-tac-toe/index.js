@@ -4,7 +4,7 @@ import { Button, Typography, withStyles, Grid, Chip, Avatar } from '@material-ui
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faDotCircle } from '@fortawesome/free-solid-svg-icons'
 import Board from './Board';
-import Editor from '../editor';
+import Editor from '../common/editor';
 import GameFunctions from './game-functions';
 import PlayerTypeMenu from './PlayerTypeMenu';
 import { Subscribe } from 'unstated';

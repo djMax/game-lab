@@ -6,7 +6,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { Client } from '@djmax/boardgame.io/react';
 import { Subscribe } from 'unstated';
-import Editor from '../editor';
+import Editor from '../common/editor';
 import MultiplayerContainer from '../common/MultiplayerContainer';
 import DominoGameManager from './boardgame';
 import Board from './components/Board';

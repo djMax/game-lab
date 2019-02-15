@@ -31,11 +31,17 @@
     <script src="/scratch/blocks_compressed_vertical.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/@babel/preset-env-standalone@7/babel-preset-env.min.js"></script>
+    <script src="https://unpkg.com/source-map@0.7.3/dist/source-map.js"></script>
+    <script>
+        sourceMap.SourceMapConsumer.initialize({
+            "lib/mappings.wasm": "https://unpkg.com/source-map@0.7.3/lib/mappings.wasm"
+        });
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.2/gh-fork-ribbon.min.css" />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <a class="github-fork-ribbon right-bottom" href="https://github.com/djmax/game-lab" data-ribbon="Fork me on GitHub" title="Make Your Own on GitHub">Make Your Own on GitHub</a>
+    <a class="github-fork-ribbon right-bottom" href="https://github.com/djmax/game-lab" data-ribbon="Make Your Own on GitHub" title="Make Your Own on GitHub">Make Your Own on GitHub</a>
   </body>
 </html>
