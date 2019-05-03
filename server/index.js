@@ -1,6 +1,7 @@
 const logger = require('pino')();
 require('@babel/register');
 
+const sslify = require('koa-sslify').default;
 const path = require('path');
 const Server = require('@djmax/boardgame.io/server').Server;
 const Dominos = require('../src/dominos/boardgame').default;
@@ -21,6 +22,11 @@ server.app._io.on('connection', (socket) => Connection.createConnection(socket))
 
 // This serves the built React app in production
 server.app.use(require('koa-static')(path.join(__dirname, '..', 'build')));
+
+if (process.env.NODE_ENV === 'production') {
+  server.app.use(sslify());
+}
+
 addHelpers({ app: server.app });
 
 process.on('unhandledRejection', error => {

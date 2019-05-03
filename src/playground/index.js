@@ -47,6 +47,9 @@ const styles = theme => ({
   invisible: {
     display: 'none',
   },
+  running: {
+    backgroundColor: '#44535a',
+  }
 });
 
 function othersWithCode(mp) {
@@ -60,13 +63,9 @@ const sampleCode = `/*
  * You have these functions:
  *   print(...args) - print the values received
  *   ask(question) - Ask a question and wait for keyboard entry
- *
- * You must have a "main" function which will be called to run your program.
  */
-async function main() {
-  const name = await ask('What is your name?');
-  print(\`Hello \${name}\`);
-}
+let name = await ask('What is your name?');
+print(\`Hello \${name}\`);
 `;
 
 class Playground extends React.Component {
@@ -114,18 +113,20 @@ class Playground extends React.Component {
         const retVal = [];
         let fn = this.cachedFn;
         if (code !== this.cachedSource || !fn) {
-          const transformed = window.Babel.transform(`retVal[0] = (async function yourCode() { ${code} return main(); })()`, { presets: ['es2015'] }).code;
+          const transformed = window.Babel.transform(`retVal[0] = Promise.resolve(0).then(async () => {\n${code}\n})`, { presets: ['es2015'] }).code;
           // eslint-disable-next-line no-new-func
           fn = new Function(...this.exposedProperties, 'retVal', transformed);
           this.cachedFn = fn;
           this.cachedSource = code;
         }
         fn(...this.exposedProperties.map(f => this[f]), retVal);
-        await retVal[0];
+        const result = await retVal[0];
+        console.log(result);
         this.consoleRef.current.addLine(['', '⏹ Your program has completed.']);
         this.setState({ running: false });
       } catch (error) {
-        this.setState({ running: false, error });
+        console.error(error);
+        this.setState({ running: false, error: error.message });
         return error.message;
       }
     });
