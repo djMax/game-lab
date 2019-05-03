@@ -73,7 +73,7 @@ class Playground extends React.Component {
     code: window.localStorage.getItem('playground.code') || sampleCode,
   }
 
-  exposedProperties = ['ask', 'print']
+  exposedProperties = ['ask', 'print', 'random']
 
   constructor(props) {
     super(props);
@@ -211,6 +211,10 @@ class Playground extends React.Component {
     this.print(question);
     const line = await this.consoleRef.current.readLine();
     return line;
+  }
+
+  random = (range) => {
+    return parseInt(Math.random() * range) + 1
   }
 }
 
