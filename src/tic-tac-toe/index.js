@@ -357,7 +357,7 @@ class TicTacToe extends React.Component {
                       <Button
                         variant="contained"
                         className={classes.button}
-                        onClick={(e) => { e.preventDefault(); this.computerMove(); }}
+                        onClick={(e) => { e.preventDefault(); this.nonHumanMove(); }}
                       >
                         Start
                       </Button>
@@ -386,7 +386,7 @@ class TicTacToe extends React.Component {
                   <Button
                     variant="contained"
                     className={classes.button}
-                    onClick={(e) => { e.preventDefault(); this.computerMove(); }}
+                    onClick={(e) => { e.preventDefault(); this.nonHumanMove(); }}
                   >
                     Make a Move
                   </Button>

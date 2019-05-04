@@ -90,8 +90,8 @@ class Nim extends MultiplayerGame {
         MultiplayerGame.pickOne,
         MultiplayerGame.random,
         board.piles.slice(0),
-        allowed,
         board.maxPick || 0,
+        allowed,
         retVal,
       );
       console.log('User code returned', retVal[0]);
